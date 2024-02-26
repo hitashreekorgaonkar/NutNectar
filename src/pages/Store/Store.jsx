@@ -25,7 +25,7 @@ const Store = () => {
       setLoading(true);
       setError(false);
       const response = await axios.get(
-        "/api/v1/ecommerce/products?page=1&limit=10"
+        "/api/v1/ecommerce/products?page=1&limit=15"
       );
       setMainProducts(response.data.data.products);
       setProducts(response.data.data.products);
@@ -128,7 +128,7 @@ const Store = () => {
           <div className="range-input relative">
             <input
               type="range"
-              className="range-min cursor-pointer absolute w-full h-1 -top-1"
+              className="range-min cursor-pointer"
               min={0}
               max={600}
               value={minLength}
@@ -136,7 +136,7 @@ const Store = () => {
             />
             <input
               type="range"
-              className="range-max cursor-pointer absolute w-full h-1 -top-1 "
+              className="range-max cursor-pointer"
               min={0}
               max={600}
               value={maxLength}

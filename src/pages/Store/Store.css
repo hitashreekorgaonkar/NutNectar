@@ -15,10 +15,15 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .range-input input {
+  position: absolute;
+  width: 100%;
+  height: 0.25rem;
+  top: -0.25rem;
   background: none;
   pointer-events: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
+  appearance: none;
+  /* -webkit-appearance: none;
+  -moz-appearance: none; */
 }
 input[type="range"]::-webkit-slider-thumb {
   height: 17px;

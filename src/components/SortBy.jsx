@@ -26,14 +26,11 @@ const setPrice = async () => {
 
   rangeInput.forEach((input) => {
     input.addEventListener("input", (e) => {
-      let minVal = parseInt(rangeInput[0].value),
-        maxVal = parseInt(rangeInput[1].value);
+      let minVal = parseInt(rangeInput[0].value);
+      let maxVal = parseInt(rangeInput[1].value);
 
       if (maxVal - minVal < priceGap) {
-        if (
-          e.target.className ===
-          "range-min cursor-pointer absolute w-full h-1 -top-1"
-        ) {
+        if (e.target.className === "range-min cursor-pointer h-1 -top-1") {
           rangeInput[0].value = maxVal - priceGap;
         } else {
           rangeInput[1].value = minVal + priceGap;

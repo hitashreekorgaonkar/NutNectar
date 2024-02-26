@@ -30,10 +30,7 @@ export const setPrice = async () => {
         maxVal = parseInt(rangeInput[1].value);
 
       if (maxVal - minVal < priceGap) {
-        if (
-          e.target.className ===
-          "range-min cursor-pointer absolute w-full h-1 -top-1"
-        ) {
+        if (e.target.className === "range-min cursor-pointer absolute w-full") {
           rangeInput[0].value = maxVal - priceGap;
         } else {
           rangeInput[1].value = minVal + priceGap;
