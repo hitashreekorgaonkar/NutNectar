@@ -12,7 +12,7 @@ import Layout from "./Layout.jsx";
 import Home from "./pages/Home.jsx";
 import Store from "./pages/Store/Store.jsx";
 import Product from "./pages/Product.jsx";
-// import ContactUs from "./components/ContactUs/ContactUs.jsx";
+import ContactUs from "./pages/ContactUs.jsx";
 
 const router = createBrowserRouter([
   {
@@ -27,10 +27,10 @@ const router = createBrowserRouter([
         path: "/store",
         element: <Store />,
       },
-      // {
-      //   path: "contact",
-      //   element: <ContactUs />,
-      // },
+      {
+        path: "contact",
+        element: <ContactUs />,
+      },
       {
         path: "/product/:productid",
         element: <Product />,
