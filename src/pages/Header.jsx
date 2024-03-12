@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
 import rucksack from "../assets/icons8-rucksack-60.png";
+import img1 from "../assets/cart24.png";
 
 export default function Header() {
   return (
@@ -49,8 +50,29 @@ export default function Header() {
           {/* <li className="mx-[10px] cursor-pointer">Why Us</li>
         <li className="mx-[10px] cursor-pointer">Contact US</li> */}
         </ul>
-        <div className="px-1 sm:px-2 py-2 bg-indigo-700 text-white rounded font-bold cursor-pointer">
-          Login/Signup
+        <div className="flex justify-between items-center">
+          <div className="px-1 sm:px-2 py-2 bg-indigo-700 text-white rounded font-bold cursor-pointer">
+            Login/Signup
+          </div>
+          <div className="ms-7">
+            {/* <img
+              className="cursor-pointer border"
+              width={24}
+              src={img1}
+              alt=""
+            /> */}
+
+            <img
+              className="cursor-pointer border relative"
+              width={24}
+              src={img1}
+              alt=""
+            />
+
+            {/* <div class="absolute top-0 right-0 border ">
+              <p>a5</p>
+            </div> */}
+          </div>
         </div>
         {/* <div className="sm:hidden">
           <Link className="text-4xl" to="http://">

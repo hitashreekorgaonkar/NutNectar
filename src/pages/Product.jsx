@@ -9,6 +9,7 @@ const Post = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [product, setProduct] = useState({});
+  const [totalItems, setTotalItems] = useState(1);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -39,6 +40,40 @@ const Post = () => {
     //   controller.abort();
     // };
   }, []);
+
+  const addItem = () => {
+    // totalItems = totalItems + 1;
+    // setTotalItems(totalItems);   // this is also fine
+    if (totalItems < product.stock) setTotalItems(totalItems + 1);
+  };
+  const removeItem = () => {
+    // totalItems = totalItems + 1;
+    // setTotalItems(totalItems);   // this is also fine
+    if (totalItems > 1) setTotalItems(totalItems - 1);
+  };
+  const addToCart = () => {
+    (async () => {
+      try {
+        setLoading(true);
+        setError(false);
+        const response = await axios.post(
+          "/api/v1/ecommerce/cart/item/" + productid,
+          {
+            quantity: totalItems,
+          }
+        );
+        console.log("response", response.data.data);
+        setLoading(false);
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log("Request canceled", error.message);
+          return;
+        }
+        setError(true);
+        setLoading(false);
+      }
+    })();
+  };
 
   return (
     <>
@@ -84,6 +119,42 @@ const Post = () => {
             {product.price && (
               <div className="">{parse(product.description)}</div>
             )}
+          </div>
+          <div className="col-span-6 md:col-span-3 my-3">
+            <div class="inline-flex rounded-md shadow-sm" role="group">
+              <button
+                type="button"
+                onClick={removeItem}
+                class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 "
+              >
+                -
+              </button>
+              <div class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200">
+                {totalItems}
+              </div>
+              <button
+                type="button"
+                onClick={addItem}
+                class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 "
+              >
+                +
+              </button>
+            </div>
+          </div>
+          <div className="col-span-6 md:col-span-3">
+            <button
+              type="submit"
+              onClick={addToCart}
+              className="rounded-0 h-12 w-40 mr-3 bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-white hover:text-black border-2 border-black"
+            >
+              ADD TO CART
+            </button>
+            <button
+              type="submit"
+              className="rounded-0 h-12 w-40 bg-white px-3 py-2 text-sm font-semibold text-black shadow-sm hover:bg-black hover:text-white border-2 border-black"
+            >
+              BUY NOW
+            </button>
           </div>
         </div>
       </div>
