@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 import rucksack from "../assets/icons8-rucksack-60.png";
 import img1 from "../assets/cart24.png";
+import QuantityContext from "../context/QuantityContext";
 
-export default function Header() {
+const Header = () => {
+  const { totalQuantity } = useContext(QuantityContext);
+
   return (
     <header className="sticky z-50 top-0">
       <nav className="w-full h-14 bgPeach flex justify-between items-center px-0 sm:px-4">
@@ -47,39 +50,23 @@ export default function Header() {
               Contact Us
             </NavLink>
           </li>
-          {/* <li className="mx-[10px] cursor-pointer">Why Us</li>
-        <li className="mx-[10px] cursor-pointer">Contact US</li> */}
         </ul>
         <div className="flex justify-between items-center">
           <div className="px-1 sm:px-2 py-2 bg-indigo-700 text-white rounded font-bold cursor-pointer">
             Login/Signup
           </div>
-          <div className="ms-7">
-            {/* <img
-              className="cursor-pointer border"
-              width={24}
-              src={img1}
-              alt=""
-            /> */}
-
-            <img
-              className="cursor-pointer border relative"
-              width={24}
-              src={img1}
-              alt=""
-            />
-
-            {/* <div class="absolute top-0 right-0 border ">
-              <p>a5</p>
-            </div> */}
-          </div>
-        </div>
-        {/* <div className="sm:hidden">
-          <Link className="text-4xl" to="http://">
-            =
+          <Link to="/cart">
+            <div className="cursor-pointer mx-7">
+              <img className="relative" width={24} src={img1} alt="" />
+              <div className="absolute top-2 right-0 bg-red-700 text-white w-5 h-5 rounded-full mx-8 text-center text-xs pt-0.5">
+                {totalQuantity ? totalQuantity : 0}
+              </div>
+            </div>{" "}
           </Link>
-        </div> */}
+        </div>
       </nav>
     </header>
   );
-}
+};
+
+export default Header;

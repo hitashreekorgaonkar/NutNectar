@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import parse from "html-react-parser";
 
-const Post = () => {
+const Product = () => {
+  const navigate = useNavigate();
   const { productid } = useParams();
 
   const [loading, setLoading] = useState(false);
@@ -21,8 +22,8 @@ const Post = () => {
         const response = await axios.get(
           "/api/v1/ecommerce/products/" + productid
         );
-        console.log("response", response.data.data);
-        console.log("description", response.data.data.description);
+        // console.log("response", response.data.data);
+        // console.log("description", response.data.data.description);
         setProduct(response.data.data);
         setLoading(false);
       } catch (error) {
@@ -34,11 +35,6 @@ const Post = () => {
         setLoading(false);
       }
     })();
-
-    // cleanup
-    // return () => {
-    //   controller.abort();
-    // };
   }, []);
 
   const addItem = () => {
@@ -62,7 +58,8 @@ const Post = () => {
             quantity: totalItems,
           }
         );
-        console.log("response", response.data.data);
+        // console.log("response", response.data.data);
+        navigate("/cart");
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -121,21 +118,21 @@ const Post = () => {
             )}
           </div>
           <div className="col-span-6 md:col-span-3 my-3">
-            <div class="inline-flex rounded-md shadow-sm" role="group">
+            <div className="inline-flex rounded-md shadow-sm" role="group">
               <button
                 type="button"
                 onClick={removeItem}
-                class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 "
+                className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 "
               >
                 -
               </button>
-              <div class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200">
+              <div className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200">
                 {totalItems}
               </div>
               <button
                 type="button"
                 onClick={addItem}
-                class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 "
+                className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 "
               >
                 +
               </button>
@@ -162,4 +159,4 @@ const Post = () => {
   );
 };
 
-export default Post;
+export default Product;
