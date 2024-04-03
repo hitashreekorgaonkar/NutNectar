@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import parse from "html-react-parser";
+import QuantityContext from "../context/QuantityContext";
 
 const Product = () => {
   const navigate = useNavigate();
   const { productid } = useParams();
+  const { setTotalQuantity } = useContext(QuantityContext);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [product, setProduct] = useState({});
-  const [totalItems, setTotalItems] = useState(1);
+  const [productQuantity, setProductQuantity] = useState(1);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -22,8 +24,6 @@ const Product = () => {
         const response = await axios.get(
           "/api/v1/ecommerce/products/" + productid
         );
-        // console.log("response", response.data.data);
-        // console.log("description", response.data.data.description);
         setProduct(response.data.data);
         setLoading(false);
       } catch (error) {
@@ -35,19 +35,45 @@ const Product = () => {
         setLoading(false);
       }
     })();
+
+    getCart();
   }, []);
 
   const addItem = () => {
-    // totalItems = totalItems + 1;
-    // setTotalItems(totalItems);   // this is also fine
-    if (totalItems < product.stock) setTotalItems(totalItems + 1);
+    setProductQuantity(productQuantity + 1);
   };
   const removeItem = () => {
-    // totalItems = totalItems + 1;
-    // setTotalItems(totalItems);   // this is also fine
-    if (totalItems > 1) setTotalItems(totalItems - 1);
+    setProductQuantity(productQuantity - 1);
   };
-  const addToCart = () => {
+
+  const getCart = () => {
+    (async () => {
+      try {
+        setLoading(true);
+        setError(false);
+        const response = await axios.get("/api/v1/ecommerce/cart");
+        const pq = response.data.data.items.filter(
+          (item) => item.product._id === productid
+        )[0].quantity;
+        setProductQuantity(pq);
+        if (response.data.data.items.length) {
+          let tq = 0;
+          response.data.data.items.filter((x) => (tq += x.quantity));
+          setTotalQuantity(tq);
+        }
+        setLoading(false);
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log("Request canceled", error.message);
+          return;
+        }
+        setError(true);
+        setLoading(false);
+      }
+    })();
+  };
+
+  const addToCart = (buyNow) => {
     (async () => {
       try {
         setLoading(true);
@@ -55,11 +81,11 @@ const Product = () => {
         const response = await axios.post(
           "/api/v1/ecommerce/cart/item/" + productid,
           {
-            quantity: totalItems,
+            quantity: productQuantity,
           }
         );
-        // console.log("response", response.data.data);
-        navigate("/cart");
+        getCart();
+        buyNow ? navigate("/cart") : "";
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -120,19 +146,21 @@ const Product = () => {
           <div className="col-span-6 md:col-span-3 my-3">
             <div className="inline-flex rounded-md shadow-sm" role="group">
               <button
+                onClick={() => removeItem()}
+                disabled={productQuantity == 1}
                 type="button"
-                onClick={removeItem}
-                className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 "
+                className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 disabled:bg-gray-100"
               >
                 -
               </button>
               <div className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200">
-                {totalItems}
+                {productQuantity}
               </div>
               <button
+                onClick={() => addItem()}
+                disabled={productQuantity >= product.stock}
                 type="button"
-                onClick={addItem}
-                className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 "
+                className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 disabled:bg-gray-100"
               >
                 +
               </button>
@@ -141,12 +169,13 @@ const Product = () => {
           <div className="col-span-6 md:col-span-3">
             <button
               type="submit"
-              onClick={addToCart}
+              onClick={() => addToCart()}
               className="rounded-0 h-12 w-40 mr-3 bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-white hover:text-black border-2 border-black"
             >
               ADD TO CART
             </button>
             <button
+              onClick={() => addToCart("buyNow")}
               type="submit"
               className="rounded-0 h-12 w-40 bg-white px-3 py-2 text-sm font-semibold text-black shadow-sm hover:bg-black hover:text-white border-2 border-black"
             >

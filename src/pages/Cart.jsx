@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import QuantityContext from "../context/QuantityContext";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [cart, setCart] = useState([]);
   const { setTotalQuantity } = useContext(QuantityContext);
+  const [cartTotal, setCartTotal] = useState();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -16,9 +20,8 @@ const Cart = () => {
         setLoading(true);
         setError(false);
         const response = await axios.get("/api/v1/ecommerce/cart");
-        // console.log("response", response.data.data.items);
         setCart(response.data.data.items);
-
+        setCartTotal(response.data.data.cartTotal);
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -31,18 +34,214 @@ const Cart = () => {
     })();
   }, []);
 
+  const checkOut = (cart, cartTotal) => {
+    console.log("1 cartTotal", cartTotal);
+    navigate(`/checkout`, { state: { cart, cartTotal } });
+  };
+
+  const addToCart = (totalItems, productid) => {
+    (async () => {
+      try {
+        setLoading(true);
+        setError(false);
+        const response = await axios.post(
+          "/api/v1/ecommerce/cart/item/" + productid,
+          {
+            quantity: totalItems,
+          }
+        );
+        console.log("response.data.data", response.data.data);
+        setCart(response.data.data.items);
+        setCartTotal(response.data.data.cartTotal);
+        setLoading(false);
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log("Request canceled", error.message);
+          return;
+        }
+        setError(true);
+        setLoading(false);
+      }
+    })();
+  };
+
+  const deleteItem = (productid) => {
+    console.log("1 totalItems");
+    (async () => {
+      try {
+        console.log("1delete", productid);
+        console.log("2 totalItems");
+
+        setLoading(true);
+        setError(false);
+        const response = await axios.delete(
+          "/api/v1/ecommerce/cart/item/" + productid
+        );
+        console.log("response.data.data", response.data.data);
+        setCart(response.data.data.items);
+        setCartTotal(response.data.data.cartTotal);
+        setLoading(false);
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log("Request canceled", error.message);
+          return;
+        }
+        setError(true);
+        setLoading(false);
+      }
+    })();
+  };
+
+  const clearCart = () => {
+    (async () => {
+      try {
+        setLoading(true);
+        setError(false);
+        const response = await axios.delete("/api/v1/ecommerce/cart/clear");
+        setCart([]);
+        setCartTotal(response.data.data.cartTotal);
+        setTotalQuantity(0);
+        setLoading(false);
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log("Request canceled", error.message);
+          return;
+        }
+        setError(true);
+        setLoading(false);
+      }
+    })();
+  };
+
   if (cart.length) {
     let tq = 0;
     cart.filter((x) => (tq += x.quantity));
     setTotalQuantity(tq);
   }
-  // let cartList = [...cart];
-  // let tq = 0;
-  // cartList.filter((x) => (tq += x.quantity));
-  // console.log("tq", tq);
-  // setTotalQuantity(tq);
+
   return (
     <>
+      {error && <h1 className="text-center mt-5">1Something went wrong</h1>}
+
+      <div className="md:container md:mx-auto md:px-16 lg:px-36">
+        <p className="text-center text-4xl text-red-500 py-2">Your Cart</p>
+        <div className="grid grid-cols-9 border-t-2 py-2 px-5">
+          <div className="col-span-6 text-center">Product</div>
+          <div className="text-center">Quantity</div>
+          <div className="col-span-2 text-center">Total</div>
+        </div>
+        {cart.map((item) => (
+          <Link to={`/product/${item.product._id}`}>
+            <div className="grid grid-cols-9 border-t-2" key={item.product._id}>
+              <div className="col-span-1">
+                <img
+                  className=" my-2 border"
+                  src={item.product.mainImage.url}
+                  alt=""
+                  srcSet=""
+                />
+              </div>
+              <div className="col-span-5 content-center ps-4">
+                {" "}
+                {item.product.name}
+              </div>
+              <div className="justify-self-center content-center">
+                <div className="inline-flex rounded-md shadow-sm" role="group">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      addToCart(item.quantity - 1, item.product._id)
+                    }
+                    disabled={item.quantity == 1}
+                    className="px-1 lg:px-2 xl:px-4 md:py-2 text-sm md:font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 disabled:bg-gray-100"
+                  >
+                    -
+                  </button>
+                  <div className="px-1 lg:px-2 xl:px-4 md:py-2 text-sm md:font-medium text-gray-900 bg-white border-t border-b border-gray-200">
+                    {item.quantity}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      addToCart(item.quantity + 1, item.product._id)
+                    }
+                    className="px-1 lg:px-2 xl:px-4 md:py-2 text-sm md:font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 disabled:bg-gray-100"
+                    disabled={item.quantity >= item.product.stock}
+                  >
+                    {/* item.product.stock, */}+
+                  </button>
+                </div>
+              </div>
+              <div className="col-span-2 content-center">
+                <svg
+                  onClick={() => deleteItem(item.product._id)}
+                  className="w-6 h-6 text-red-500 hover:text-black float-right"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                  />
+                </svg>
+                <p className="text-center">
+                  {" "}
+                  Rs. {item.quantity * item.product.price}
+                </p>
+              </div>
+            </div>
+          </Link>
+        ))}
+        {cart.length != 0 && (
+          <div className="flex justify-center items-center">
+            <div
+              onClick={() => clearCart()}
+              className="px-4 sm:px-6 py-2 shadow bg-gray-200 text-black hover:bg-black hover:text-gray-200 rounded-full cursor-pointer"
+            >
+              CLEAR All
+            </div>
+          </div>
+        )}
+
+        {cart.length != 0 && (
+          <div className="grid grid-cols-3 my-8 ">
+            <div className="col-span-2">
+              {/* <p className="text-xl">Additional Comments</p>
+            <textarea
+              placeholder="Add a note to your order"
+              className="resize border border-gray-200 rounded-md w-full px-3 py-2 mt-3  focus:border-gray-400 focus:outline-0
+              placeholder:text-sm"
+            ></textarea> */}
+            </div>
+            <div className="col-span-1 md:col-span-1 px-2">
+              <div className="flex justify-between">
+                <p className="text-xl font-semibold text-left">Total</p>
+                <p className="text-xl font-semibold text-right">
+                  ₹ {cartTotal}
+                </p>
+              </div>{" "}
+              <p className="text-sm text-gray-400 text-right my-3  focus-visible:border-none">
+                Tax included and shipping calculated at checkout
+              </p>
+              <div className="flex justify-center items-center">
+                {/* <Link to={`/checkout`}> */}
+                <div
+                  onClick={() => checkOut(cart, cartTotal)}
+                  className="px-20 sm:px-48 py-4 shadow bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white rounded-full cursor-pointer text-xl"
+                >
+                  CHECKOUT
+                </div>
+                {/* </Link> */}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       {loading && (
         <div className="my-5 text-center">
           <button
@@ -62,15 +261,6 @@ const Cart = () => {
           </button>
         </div>
       )}
-      {error && <h1 className="text-center mt-5">1Something went wrong</h1>}
-
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 px-5">
-        {cart.map((item) => (
-          <div className="" key={item.product._id}>
-            {item.product.name}
-          </div>
-        ))}
-      </div>
     </>
   );
 };

@@ -14,6 +14,8 @@ import Store from "./pages/Store/Store.jsx";
 import Product from "./pages/Product.jsx";
 import ContactUs from "./pages/ContactUs.jsx";
 import Cart from "./pages/Cart.jsx";
+import Checkout from "./pages/Checkout.jsx";
+import OrderStatus from "./pages/OrderStatus.jsx";
 
 const router = createBrowserRouter([
   {
@@ -41,6 +43,14 @@ const router = createBrowserRouter([
         element: <Cart />,
       },
     ],
+  },
+  {
+    path: "/checkout",
+    element: <Checkout />,
+  },
+  {
+    path: "/order-status",
+    element: <OrderStatus />,
   },
 ]);
 
