@@ -16,6 +16,7 @@ import ContactUs from "./pages/ContactUs.jsx";
 import Cart from "./pages/Cart.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import OrderStatus from "./pages/OrderStatus.jsx";
+import Login from "./pages/Login.jsx";
 
 const router = createBrowserRouter([
   {
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
   {
     path: "/order-status",
     element: <OrderStatus />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
   },
 ]);
 

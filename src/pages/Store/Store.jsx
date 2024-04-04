@@ -2,8 +2,9 @@ import { React, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import "./Store.css";
 import img1 from "../../assets/dryfruitsBckg_5.png";
-import { Card } from "../../components";
 import { setPrice } from "../../components/SetPrice";
+import Card from "../../components/Card";
+
 const Store = () => {
   const [products, setProducts] = useState([]);
   const [mainProducts, setMainProducts] = useState([]);

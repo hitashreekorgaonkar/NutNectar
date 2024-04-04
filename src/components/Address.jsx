@@ -1,10 +1,8 @@
 import React, { useCallback } from "react";
 import { useForm } from "react-hook-form";
-import Input from "./Input.jsx";
-import Button from "../components/Button";
-import Select from "../components/Select";
+import { Button, Input, Select } from "../components/index";
 
-const AddressForm = ({ address }) => {
+const Address = ({ address }) => {
   const indianStates = [
     "Andhra Pradesh",
     "Arunachal Pradesh",
@@ -163,4 +161,4 @@ const AddressForm = ({ address }) => {
   );
 };
 
-export default AddressForm;
+export default Address;
