@@ -1,17 +1,45 @@
-import React, { useState } from "react";
-import Input from "../components/Input";
+import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 // import { login as authLogin } from "../store/authSlice";
 import { Button, Input2 } from "../components/index";
-// import { useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 // import authService from "../appwrite/auth";
 import { useForm } from "react-hook-form";
-
+import axios from "axios";
+import LoggedInUserContext from "../context/loggedInUser/LoggedInUserContext";
 const Login = ({ isDialogOpen, onClose }) => {
   const navigate = useNavigate();
   // const dispatch = useDispatch();
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, reset } = useForm();
   const [error, setError] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const { setLoggedUser } = useContext(LoggedInUserContext);
+
+  const onClose2 = () => {
+    reset({});
+  };
+
+  const login = async (data) => {
+    console.log("Ddddd");
+    setError("");
+    try {
+      const response = await axios.post("/api/v1/users/login", {
+        username: data.username,
+        password: data.password,
+      });
+      if (response.data.statusCode === 200) {
+        onClose();
+        navigate("/");
+        localStorage.setItem("auth", response.data.data.accessToken);
+        setLoggedUser(true);
+        reset({});
+      }
+    } catch (error) {
+      console.log("error", error);
+      setLoginError(error?.response.data?.message);
+      setError(error.message);
+    }
+  };
 
   return (
     <>
@@ -30,7 +58,10 @@ const Login = ({ isDialogOpen, onClose }) => {
                 <div className="bg-white rounded-lg">
                   <div className="absolute -right-3 -top-3">
                     <button
-                      onClick={onClose}
+                      onClick={() => {
+                        onClose();
+                        onClose2();
+                      }}
                       type="button"
                       className="rounded-full bg-white px-1 py-1 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                     >
@@ -38,13 +69,13 @@ const Login = ({ isDialogOpen, onClose }) => {
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
-                        stroke-width="1.5"
+                        strokeWidth="1.5"
                         stroke="currentColor"
-                        class="w-5 h-5"
+                        className="w-5 h-5"
                       >
                         <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
                           d="M6 18 18 6M6 6l12 12"
                         />
                       </svg>
@@ -63,28 +94,34 @@ const Login = ({ isDialogOpen, onClose }) => {
                     </h2>
 
                     {error && (
-                      <p className="text-red-600 mt-8 text-center">{error}</p>
+                      <p className="text-red-600 mt-8 text-center">
+                        {loginError}
+                      </p>
                     )}
-                    <div className="space-y-5">
-                      <Input2
-                        label="Username"
-                        labelClassName="text-indigo-700"
-                        placeholder="Username"
-                      />
-                      <Input2
-                        label="Password"
-                        labelClassName="text-indigo-700"
-                        placeholder="Password"
-                        type="password"
-                      />
-                      <Button
-                        type="submit"
-                        className="w-full"
-                        bgColor="bg-indigo-700"
-                      >
-                        Login
-                      </Button>
-                    </div>
+                    <form onSubmit={handleSubmit(login)} className="mt-8">
+                      <div className="space-y-5">
+                        <Input2
+                          label="Username"
+                          labelclassname="text-indigo-700"
+                          placeholder="Username"
+                          {...register("username", { required: true })}
+                        />
+                        <Input2
+                          label="Password"
+                          labelclassname="text-indigo-700"
+                          placeholder="Password"
+                          type="password"
+                          {...register("password", { required: true })}
+                        />
+                        <Button
+                          type="submit"
+                          className="w-full"
+                          bgColor="bg-indigo-700"
+                        >
+                          Login
+                        </Button>
+                      </div>
+                    </form>
                     <p className="my-2 text-base text-black/60">
                       Don&apos;t have any account?&nbsp;
                       <Link

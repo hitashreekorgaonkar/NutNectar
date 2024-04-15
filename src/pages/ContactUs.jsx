@@ -1,5 +1,5 @@
 import React from "react";
-import ContactForm from "../components/ContactForm";
+import Contact from "../components/Contact";
 
 export default function ContactUs() {
   return (
@@ -68,7 +68,7 @@ export default function ContactUs() {
           ></iframe>
         </div>
         <div className="col-start-1 col-span-8 lg:col-start-4 lg:col-span-3 px-4">
-          <ContactForm />
+          <Contact />
         </div>
       </div>
     </div>

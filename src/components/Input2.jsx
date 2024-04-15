@@ -20,8 +20,6 @@ const Input2 = React.forwardRef(function Input(
           {label}
         </label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          id={id}
           type={
             type == "password"
               ? isPasswordVisible
@@ -29,7 +27,11 @@ const Input2 = React.forwardRef(function Input(
                 : "password"
               : type
           }
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           placeholder={placeholder}
+          ref={ref}
+          {...props}
+          id={id}
         />
         {type == "password" && (
           <button

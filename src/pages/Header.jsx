@@ -2,18 +2,58 @@ import React, { useContext, useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
 import rucksack from "../assets/icons8-rucksack-60.png";
 import img1 from "../assets/cart24.png";
+import user from "../assets/user.png";
 import QuantityContext from "../context/QuantityContext";
+import LoggedInUserContext from "../context/loggedInUser/LoggedInUserContext";
 import Login from "./Login";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 const Header = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const { totalQuantity } = useContext(QuantityContext);
+  const { loggedUser } = useContext(LoggedInUserContext);
+  const { setLoggedUser } = useContext(LoggedInUserContext);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
   };
 
+  useEffect(() => {
+    // const logged = localStorage.getItem("auth");
+    // if (logged) {
+    //   setLoggedUser(true);
+    // }
+    // console.log("logged", logged);
+  }, []);
+
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
+  };
+
+  const logout = () => {
+    (async () => {
+      try {
+        setLoading(true);
+        setError(false);
+        const response = await axios.post("/api/v1/users/logout");
+        if (response.data.statusCode === 200) {
+          localStorage.removeItem("auth");
+          setLoggedUser(false);
+          navigate("/");
+        }
+
+        setLoading(false);
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log("Request canceled", error.message);
+          return;
+        }
+        setError(true);
+        setLoading(false);
+      }
+    })();
   };
 
   return (
@@ -62,12 +102,36 @@ const Header = () => {
             </li>
           </ul>
           <div className="flex justify-between items-center">
-            <div
-              onClick={handleOpenDialog}
-              className="px-1 sm:px-2 py-2 bg-indigo-700 text-white rounded font-bold cursor-pointer"
-            >
-              Login/Signup
-            </div>
+            {!loggedUser && (
+              <div
+                onClick={handleOpenDialog}
+                className="px-1 sm:px-2 py-2 bg-indigo-700 text-white rounded font-bold cursor-pointer"
+              >
+                Login/Signup
+              </div>
+            )}
+            {loggedUser && (
+              <Link to="/account">
+                <div className="cursor-pointer mr-4">
+                  <img
+                    className="relative mx-auto"
+                    width={24}
+                    src={user}
+                    alt=""
+                  />
+                  <p>Profile</p>
+                </div>
+              </Link>
+            )}
+
+            {loggedUser && (
+              <div
+                onClick={() => logout()}
+                className="px-1 sm:px-2 py-2 bg-indigo-700 text-white rounded font-bold cursor-pointer"
+              >
+                Logout
+              </div>
+            )}
             <Link to="/cart">
               <div className="cursor-pointer mx-7">
                 <img className="relative" width={24} src={img1} alt="" />
