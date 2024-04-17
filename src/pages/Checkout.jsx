@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import rucksack from "../assets/icons8-rucksack-60.png";
 import img1 from "../assets/cart24.png";
 import { useNavigate } from "react-router-dom";
-import Address from "../components/Address";
+import AddressFrom from "../components/AddressForm";
 
 const Checkout = () => {
   const [address, setAddress] = useState(null);
@@ -89,7 +89,8 @@ const Checkout = () => {
         <div className="grid grid-cols-11 my-8 border-gray-200">
           <div className="col-span-11 lg:col-span-7 xl:col-span-6 lg:border-r-2 md:px-40 lg:px-8">
             <p className="text-xl font-semibold pb-2">Delivery</p>
-            {address ? <Address address={address} /> : null}
+            {/* {address ? <Address address={address} /> : null} */}
+            {address ? <AddressFrom address={address} /> : null}
             <div
               className="hidden lg:grid px-20 sm:px-48 py-4 shadow bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white
                rounded-full cursor-pointer text-center text-xl lg:px-8 mt-5"

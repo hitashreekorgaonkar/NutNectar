@@ -1,6 +1,6 @@
 import Input from "./Input";
 import Input2 from "./Input2";
-import Address from "./Address";
+import AddressForm from "./AddressForm";
 import Button from "./Button";
 import Select from "./Select";
 
@@ -16,7 +16,7 @@ export {
   //   Signup,
   Login,
   Button,
-  Address,
+  AddressForm,
   Input,
   Input2,
   Select,
