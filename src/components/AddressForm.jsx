@@ -4,11 +4,12 @@ import { Button, Input, Select } from "./index";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const AddressFrom = ({ addrDialogOpen, onClose, isEdit, address }) => {
+const AddressForm = ({ addrDialogOpen, onClose, isEdit, address }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [loginError, setLoginError] = useState("");
   // const [localAddress, setLocalAddress] = useState(address || "");
+
   const onClose2 = () => {
     reset({});
   };
@@ -276,4 +277,4 @@ const AddressFrom = ({ addrDialogOpen, onClose, isEdit, address }) => {
   );
 };
 
-export default AddressFrom;
+export default AddressForm;
