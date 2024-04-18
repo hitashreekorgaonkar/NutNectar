@@ -13,7 +13,8 @@ const AddressList = ({ address }) => {
           {address?.addressLine1}
         </p>
         <p className="text-sm text-slate-500 hover:text-slate-600">
-          {address?.addressLine2} {address?.city} {address?.state}
+          {address?.addressLine2} {address?.city} {address?.pincode}{" "}
+          {address?.state}
         </p>
       </div>
       {/* </div> */}

@@ -22,7 +22,7 @@ const Checkout = () => {
         setLoading(true);
         setError(false);
         const response = await axios.get(
-          "/api/v1/ecommerce/addresses/660861ca00570d85e858a3a1"
+          "/api/v1/ecommerce/addresses/6608618400570d85e858a393"
         );
         setAddress(response.data.data);
         setLoading(false);
@@ -38,35 +38,33 @@ const Checkout = () => {
   }, []);
 
   const addOrder = () => {
-    navigate(`/order-status`);
-    // (async () => {
-    //   try {
-    //     setLoading(true);
-    //     setError(false);
-    //     const response = await axios.post(
-    //       "/api/v1/ecommerce/orders/provider/paypal",
-    //       {
-    //         addressId: addressID,
-    //       }
-    //     );
-    //     console.log("response", response.data);
-    //     const response2 = await axios.post(
-    //       "/api/v1/ecommerce/orders/provider/paypal/verify-payment",
-    //       {
-    //         orderId: response.data.id,
-    //       }
-    //     );
-    //     console.log("response2", response2);
-    //     setLoading(false);
-    //   } catch (error) {
-    //     if (axios.isCancel(error)) {
-    //       console.log("Request canceled", error.message);
-    //       return;
-    //     }
-    //     setError(true);
-    //     setLoading(false);
-    //   }
-    // })();
+    (async () => {
+      try {
+        setLoading(true);
+        setError(false);
+        const response = await axios.post(
+          "/api/v1/ecommerce/orders/provider/razorpal",
+          {
+            addressId: "6608618400570d85e858a393",
+          }
+        );
+        // const response2 = await axios.post(
+        //   "/api/v1/ecommerce/orders/provider/paypal/verify-payment",
+        //   {
+        //     orderId: response.data.id,
+        //   }
+        // );
+        navigate(`/order-status`);
+        setLoading(false);
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log("Request canceled", error.message);
+          return;
+        }
+        setError(true);
+        setLoading(false);
+      }
+    })();
   };
 
   return (

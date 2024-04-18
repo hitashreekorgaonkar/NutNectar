@@ -20,7 +20,6 @@ const Login = ({ isDialogOpen, onClose }) => {
   };
 
   const login = async (data) => {
-    console.log("Ddddd");
     setError("");
     try {
       const response = await axios.post("/api/v1/users/login", {
@@ -31,7 +30,8 @@ const Login = ({ isDialogOpen, onClose }) => {
         onClose();
         navigate("/");
         localStorage.setItem("auth", response.data.data.accessToken);
-        setLoggedUser(true);
+        var authValue = localStorage.getItem("auth");
+        setLoggedUser(authValue);
         reset({});
       }
     } catch (error) {

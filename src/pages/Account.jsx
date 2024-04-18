@@ -2,22 +2,24 @@ import React, { useContext, useState, useEffect } from "react";
 import LoggedInUserContext from "../context/loggedInUser/LoggedInUserContext";
 import axios from "axios";
 import shoppingbag from "../assets/bag.png";
-// import Ashoppingbag from "../assets/bagA.png";
 import user from "../assets/user.png";
-// import Auser from "../assets/userA.png";
 import location from "../assets/location.png";
-import Alocation from "../assets/locationA.png";
 import { useNavigate } from "react-router-dom";
-import { AddressCard, AddressForm } from "../components/index";
+import {
+  AddressCard,
+  AddressForm,
+  OrdersList,
+  Profile,
+} from "../components/index";
 
 const Account = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [addrDialogOpen, setAddrDialogOpen] = useState(false);
-  const [orderActive, setOrderActive] = useState(true);
-  const [addrActive, setAddrActive] = useState(false);
+  const [addrActive, setAddrActive] = useState(true);
   const [profileActive, setProfileActive] = useState(false);
   const [addressList, setAddressList] = useState([]);
+  const [profile, setProfile] = useState({});
   const [address, setAddress] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
 
@@ -25,10 +27,18 @@ const Account = () => {
   const navigate = useNavigate();
 
   const setAddrTab = () => {
-    setOrderActive(false);
     setAddrActive(true);
     setProfileActive(false);
+    setProfileUser();
+    setAddressMenu();
+  };
 
+  useEffect(() => {
+    setAddressMenu();
+    setProfileUser();
+  }, []);
+
+  const setAddressMenu = () => {
     (async () => {
       try {
         setLoading(true);
@@ -36,7 +46,6 @@ const Account = () => {
         const response = await axios.get(
           "/api/v1/ecommerce/addresses?page=1&limit=10"
         );
-        console.log("response.data.data", response.data.data.addresses);
         setAddressList(response.data.data.addresses);
         setLoading(false);
       } catch (error) {
@@ -50,16 +59,45 @@ const Account = () => {
     })();
   };
 
-  const setOrderTab = () => {
-    setOrderActive(true);
-    setAddrActive(false);
-    setProfileActive(false);
+  const setProfileUser = () => {
+    (async () => {
+      try {
+        setLoading(true);
+        setError(false);
+        const response = await axios.get("/api/v1/ecommerce/profile");
+        setProfile(response.data.data);
+        setLoading(false);
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log("Request canceled", error.message);
+          return;
+        }
+        setError(true);
+        setLoading(false);
+      }
+    })();
   };
 
   const setProfileTab = () => {
-    setOrderActive(false);
     setAddrActive(false);
     setProfileActive(true);
+
+    (async () => {
+      try {
+        setLoading(true);
+        setError(false);
+        const response = await axios.get("/api/v1/ecommerce/profile");
+        setProfile(response.data.data);
+        setLoading(false);
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log("Request canceled", error.message);
+          return;
+        }
+        setError(true);
+        setLoading(false);
+      }
+    })();
   };
 
   const handleAdd = () => {
@@ -86,7 +124,8 @@ const Account = () => {
         const response = await axios.post("/api/v1/users/logout");
         if (response.data.statusCode === 200) {
           localStorage.removeItem("auth");
-          setLoggedUser(false);
+          var authValue = localStorage.getItem("auth");
+          setLoggedUser(authValue);
           navigate("/");
         }
 
@@ -110,7 +149,7 @@ const Account = () => {
             <p className="text-xl font-semibold border-b py-2 border-gray-500">
               My Account
             </p>
-            <p
+            {/* <p
               onClick={() => setOrderTab()}
               className={`${
                 orderActive ? "bg-white text-blue-800" : ""
@@ -124,7 +163,7 @@ const Account = () => {
                 alt=""
               />
               Orders
-            </p>
+            </p> */}
             <p
               onClick={() => setAddrTab()}
               className={`${
@@ -177,12 +216,15 @@ const Account = () => {
                 <p className="border-b mx-10"></p>
               </>
             )}
+
+            {profileActive && <Profile loading={loading} profile={profile} />}
           </div>
           {/* <div className="row-span-2 col-span-2">03</div> */}
         </div>
       </div>
       <AddressForm
         address={address}
+        isEdit={isEdit}
         onClose={handleCloseDialog}
         addrDialogOpen={addrDialogOpen}
       />

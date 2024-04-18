@@ -35,7 +35,6 @@ const Cart = () => {
   }, []);
 
   const checkOut = (cart, cartTotal) => {
-    console.log("1 cartTotal", cartTotal);
     navigate(`/checkout`, { state: { cart, cartTotal } });
   };
 
@@ -50,7 +49,6 @@ const Cart = () => {
             quantity: totalItems,
           }
         );
-        console.log("response.data.data", response.data.data);
         setCart(response.data.data.items);
         setCartTotal(response.data.data.cartTotal);
         setLoading(false);
@@ -66,18 +64,13 @@ const Cart = () => {
   };
 
   const deleteItem = (productid) => {
-    console.log("1 totalItems");
     (async () => {
       try {
-        console.log("1delete", productid);
-        console.log("2 totalItems");
-
         setLoading(true);
         setError(false);
         const response = await axios.delete(
           "/api/v1/ecommerce/cart/item/" + productid
         );
-        console.log("response.data.data", response.data.data);
         setCart(response.data.data.items);
         setCartTotal(response.data.data.cartTotal);
         setLoading(false);
@@ -131,70 +124,66 @@ const Cart = () => {
           <div className="col-span-2 text-center">Total</div>
         </div>
         {cart.map((item) => (
-          <Link to={`/product/${item.product._id}`}>
-            <div className="grid grid-cols-9 border-t-2" key={item.product._id}>
-              <div className="col-span-1">
-                <img
-                  className=" my-2 border"
-                  src={item.product.mainImage.url}
-                  alt=""
-                  srcSet=""
-                />
-              </div>
-              <div className="col-span-5 content-center ps-4">
-                {" "}
-                {item.product.name}
-              </div>
-              <div className="justify-self-center content-center">
-                <div className="inline-flex rounded-md shadow-sm" role="group">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      addToCart(item.quantity - 1, item.product._id)
-                    }
-                    disabled={item.quantity == 1}
-                    className="px-1 lg:px-2 xl:px-4 md:py-2 text-sm md:font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 disabled:bg-gray-100"
-                  >
-                    -
-                  </button>
-                  <div className="px-1 lg:px-2 xl:px-4 md:py-2 text-sm md:font-medium text-gray-900 bg-white border-t border-b border-gray-200">
-                    {item.quantity}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      addToCart(item.quantity + 1, item.product._id)
-                    }
-                    className="px-1 lg:px-2 xl:px-4 md:py-2 text-sm md:font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 disabled:bg-gray-100"
-                    disabled={item.quantity >= item.product.stock}
-                  >
-                    {/* item.product.stock, */}+
-                  </button>
-                </div>
-              </div>
-              <div className="col-span-2 content-center">
-                <svg
-                  onClick={() => deleteItem(item.product._id)}
-                  className="w-6 h-6 text-red-500 hover:text-black float-right"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
+          // <Link to={`/product/${item.product._id}`}>
+          <div className="grid grid-cols-9 border-t-2" key={item.product._id}>
+            <div className="col-span-1">
+              <img
+                className=" my-2 border"
+                src={item.product.mainImage.url}
+                alt=""
+                srcSet=""
+              />
+            </div>
+            <div className="col-span-5 content-center ps-4">
+              {" "}
+              {item.product.name}
+            </div>
+            <div className="justify-self-center content-center">
+              <div className="inline-flex rounded-md shadow-sm" role="group">
+                <button
+                  type="button"
+                  onClick={() => addToCart(item.quantity - 1, item.product._id)}
+                  disabled={item.quantity == 1}
+                  className="px-1 lg:px-2 xl:px-4 md:py-2 text-sm md:font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 disabled:bg-gray-100"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                  />
-                </svg>
-                <p className="text-center">
-                  {" "}
-                  Rs. {item.quantity * item.product.price}
-                </p>
+                  -
+                </button>
+                <div className="px-1 lg:px-2 xl:px-4 md:py-2 text-sm md:font-medium text-gray-900 bg-white border-t border-b border-gray-200">
+                  {item.quantity}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => addToCart(item.quantity + 1, item.product._id)}
+                  className="px-1 lg:px-2 xl:px-4 md:py-2 text-sm md:font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 disabled:bg-gray-100"
+                  disabled={item.quantity >= item.product.stock}
+                >
+                  {/* item.product.stock, */}+
+                </button>
               </div>
             </div>
-          </Link>
+            <div className="col-span-2 content-center">
+              <svg
+                onClick={() => deleteItem(item.product._id)}
+                className="w-6 h-6 text-red-500 hover:text-black float-right"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                />
+              </svg>
+              <p className="text-center">
+                {" "}
+                Rs. {item.quantity * item.product.price}
+              </p>
+            </div>
+          </div>
+          // </Link>
         ))}
         {cart.length != 0 && (
           <div className="flex justify-center items-center">

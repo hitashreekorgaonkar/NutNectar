@@ -11,7 +11,7 @@ const OrderStatus = () => {
           width="80"
           className="pt-4 pb-5 mx-auto"
           alt=""
-          srcset=""
+          srcet=""
         />
         <h4 className="">Payment Success!</h4>
         <p className="text-secondary">

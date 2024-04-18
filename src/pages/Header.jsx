@@ -21,39 +21,12 @@ const Header = () => {
   };
 
   useEffect(() => {
-    // const logged = localStorage.getItem("auth");
-    // if (logged) {
-    //   setLoggedUser(true);
-    // }
-    // console.log("logged", logged);
+    var authValue = localStorage.getItem("auth");
+    setLoggedUser(authValue);
   }, []);
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
-  };
-
-  const logout = () => {
-    (async () => {
-      try {
-        setLoading(true);
-        setError(false);
-        const response = await axios.post("/api/v1/users/logout");
-        if (response.data.statusCode === 200) {
-          localStorage.removeItem("auth");
-          setLoggedUser(false);
-          navigate("/");
-        }
-
-        setLoading(false);
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          console.log("Request canceled", error.message);
-          return;
-        }
-        setError(true);
-        setLoading(false);
-      }
-    })();
   };
 
   return (
@@ -102,6 +75,7 @@ const Header = () => {
             </li>
           </ul>
           <div className="flex justify-between items-center">
+            {" "}
             {!loggedUser && (
               <div
                 onClick={handleOpenDialog}
@@ -122,15 +96,6 @@ const Header = () => {
                   <p>Profile</p>
                 </div>
               </Link>
-            )}
-
-            {loggedUser && (
-              <div
-                onClick={() => logout()}
-                className="px-1 sm:px-2 py-2 bg-indigo-700 text-white rounded font-bold cursor-pointer"
-              >
-                Logout
-              </div>
             )}
             <Link to="/cart">
               <div className="cursor-pointer mx-7">

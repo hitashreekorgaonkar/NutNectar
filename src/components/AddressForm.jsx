@@ -70,7 +70,7 @@ const AddressForm = ({ addrDialogOpen, onClose, isEdit, address }) => {
       city: address?.city || "",
       pincode: address?.pincode || "",
       state: address?.state || "",
-      country: address?.country || "",
+      country: address?.country || "India",
     });
     // setLocalAddress(address || "");
   }, [address, reset]);
@@ -252,6 +252,7 @@ const AddressForm = ({ addrDialogOpen, onClose, isEdit, address }) => {
                             options={["India"]}
                             label="country"
                             className=""
+                            disabled
                             {...register("country", { required: true })}
                           />
                         </div>
