@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
 import rucksack from "../assets/icons8-rucksack-60.png";
 import img1 from "../assets/cart24.png";
 import { useNavigate } from "react-router-dom";
-import AddressForm from "../components/AddressForm";
+import { AddressList } from "../components";
+import SelectAddress from "../components/SelectAddress";
 
 const Checkout = () => {
-  const [address, setAddress] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [address, setAddress] = useState(null);
+  const [changeAddrDialog, setChangeAddrDialog] = useState(false);
 
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -25,6 +27,7 @@ const Checkout = () => {
           "/api/v1/ecommerce/addresses/6608618400570d85e858a393"
         );
         setAddress(response.data.data);
+        console.log("setAddress", response.data.data);
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -36,6 +39,14 @@ const Checkout = () => {
       }
     })();
   }, []);
+
+  const changeAdd = () => {
+    setChangeAddrDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setChangeAddrDialog(false);
+  };
 
   const addOrder = () => {
     (async () => {
@@ -82,13 +93,28 @@ const Checkout = () => {
           <div></div>
         </nav>
       </header>
-
       <div className="px-4 lg:px-2 xl:px-11 2xl:px-48">
         <div className="grid grid-cols-11 my-8 border-gray-200">
           <div className="col-span-11 lg:col-span-7 xl:col-span-6 lg:border-r-2 md:px-40 lg:px-8">
             <p className="text-xl font-semibold pb-2">Delivery</p>
-            {/* {address ? <Address address={address} /> : null} */}
-            {address ? <AddressForm address={address} /> : null}
+            {address ? (
+              <div
+                className="grid grid-cols-12 justify-between px-9 py-4"
+                key={address?._id}
+              >
+                <AddressList address={address} />
+                <div className="col-1">
+                  <div className="flex">
+                    <div
+                      onClick={changeAdd}
+                      className="px-1 sm:px-2 py-2 bg-indigo-700 text-white rounded font-bold cursor-pointer"
+                    >
+                      Change
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : null}
             <div
               className="hidden lg:grid px-20 sm:px-48 py-4 shadow bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white
                rounded-full cursor-pointer text-center text-xl lg:px-8 mt-5"
@@ -168,6 +194,11 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+      <SelectAddress
+        address={address}
+        onClose={handleCloseDialog}
+        changeAddrDialog={changeAddrDialog}
+      />
     </>
   );
 };
