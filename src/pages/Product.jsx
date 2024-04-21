@@ -59,7 +59,9 @@ const Product = () => {
         if (response.data.data.items.length) {
           let tq = 0;
           response.data.data.items.filter((x) => (tq += x.quantity));
-          setTotalQuantity(tq);
+          localStorage.setItem("tq", tq);
+          var totqnty = localStorage.getItem("tq");
+          setTotalQuantity(totqnty);
         }
         setLoading(false);
       } catch (error) {

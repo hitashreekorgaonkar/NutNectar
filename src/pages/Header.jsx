@@ -15,6 +15,7 @@ const Header = () => {
   const { totalQuantity } = useContext(QuantityContext);
   const { loggedUser } = useContext(LoggedInUserContext);
   const { setLoggedUser } = useContext(LoggedInUserContext);
+  const { setTotalQuantity } = useContext(QuantityContext);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
@@ -23,6 +24,9 @@ const Header = () => {
   useEffect(() => {
     var authValue = localStorage.getItem("auth");
     setLoggedUser(authValue);
+
+    var totqnty = localStorage.getItem("tq");
+    setTotalQuantity(totqnty);
   }, []);
 
   const handleCloseDialog = () => {

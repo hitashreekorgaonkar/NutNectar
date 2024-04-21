@@ -93,6 +93,9 @@ const Cart = () => {
         const response = await axios.delete("/api/v1/ecommerce/cart/clear");
         setCart([]);
         setCartTotal(response.data.data.cartTotal);
+        localStorage.setItem("tq", 0);
+        // var totqnty = localStorage.getItem("tq");
+        // setTotalQuantity(totqnty);
         setTotalQuantity(0);
         setLoading(false);
       } catch (error) {
@@ -109,7 +112,10 @@ const Cart = () => {
   if (cart.length) {
     let tq = 0;
     cart.filter((x) => (tq += x.quantity));
-    setTotalQuantity(tq);
+    localStorage.setItem("tq", tq);
+    var totqnty = localStorage.getItem("tq");
+    setTotalQuantity(totqnty);
+    // setTotalQuantity(tq);
   }
 
   return (
