@@ -6,6 +6,7 @@ import OrdersList from "./OrdersList";
 import AddressList from "./AddressList";
 import AddressForm from "./AddressForm";
 import AddressCard from "./AddressCard";
+import SelectAddress from "../pages/SelectAddress";
 import Profile from "./Profile";
 import Login from "../pages/Login";
 import Header from "../pages/Header";
@@ -22,6 +23,7 @@ export {
   OrdersList,
   AddressList,
   AddressForm,
+  SelectAddress,
   AddressCard,
   Profile,
   Input,

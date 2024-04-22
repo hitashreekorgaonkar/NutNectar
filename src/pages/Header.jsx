@@ -6,8 +6,8 @@ import user from "../assets/user.png";
 import QuantityContext from "../context/QuantityContext";
 import LoggedInUserContext from "../context/loggedInUser/LoggedInUserContext";
 import Login from "./Login";
-import { useSelector } from "react-redux";
-import axios from "axios";
+// import { useSelector } from "react-redux";
+// import axios from "axios";
 
 const Header = () => {
   const [loading, setLoading] = useState(false);

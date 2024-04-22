@@ -5,29 +5,58 @@ import rucksack from "../assets/icons8-rucksack-60.png";
 import img1 from "../assets/cart24.png";
 import { useNavigate } from "react-router-dom";
 import { AddressList } from "../components";
-import SelectAddress from "../components/SelectAddress";
+import SelectAddress from "./SelectAddress";
 
 const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [address, setAddress] = useState(null);
+  const [addressid, setAddressID] = useState(null);
   const [changeAddrDialog, setChangeAddrDialog] = useState(false);
-
   const navigate = useNavigate();
   const { state } = useLocation();
 
   useEffect(() => {
-    const controller = new AbortController();
-    // ;(async () => {  here ; is effie
+    setAddressMenu();
+  }, []);
+
+  const getAddress = (selAddr) => {
     (async () => {
       try {
         setLoading(true);
         setError(false);
         const response = await axios.get(
-          "/api/v1/ecommerce/addresses/6608618400570d85e858a393"
+          "/api/v1/ecommerce/addresses/" + selAddr
         );
-        setAddress(response.data.data);
-        console.log("setAddress", response.data.data);
+        if (response.data.statusCode == 200) {
+          setAddress(response.data.data);
+          setAddressID(response.data.data._id);
+        }
+
+        setLoading(false);
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log("Request canceled", error.message);
+          return;
+        }
+        setError(true);
+        setLoading(true);
+      }
+    })();
+  };
+
+  const setAddressMenu = () => {
+    (async () => {
+      try {
+        setLoading(true);
+        setError(false);
+        const response = await axios.get(
+          "/api/v1/ecommerce/addresses?page=1&limit=1"
+        );
+        if (response.data.statusCode == 200) {
+          setAddress(response.data.data.addresses[0]);
+          setAddressID(response.data.data.addresses[0]._id);
+        }
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -38,13 +67,14 @@ const Checkout = () => {
         setLoading(false);
       }
     })();
-  }, []);
+  };
 
   const changeAdd = () => {
     setChangeAddrDialog(true);
   };
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = (selectedAddress) => {
+    getAddress(selectedAddress);
     setChangeAddrDialog(false);
   };
 
@@ -56,17 +86,33 @@ const Checkout = () => {
         const response = await axios.post(
           "/api/v1/ecommerce/orders/provider/razorpal",
           {
-            addressId: "6608618400570d85e858a393",
+            addressId: addressid,
           }
         );
-        // const response2 = await axios.post(
-        //   "/api/v1/ecommerce/orders/provider/paypal/verify-payment",
-        //   {
-        //     orderId: response.data.id,
-        //   }
-        // );
-        navigate(`/order-status`);
+        clearCart();
         setLoading(false);
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log("Request canceled", error.message);
+          return;
+        }
+        setError(true);
+        setLoading(false);
+      }
+    })();
+  };
+
+  const clearCart = () => {
+    (async () => {
+      try {
+        setLoading(true);
+        setError(false);
+        const response = await axios.delete("/api/v1/ecommerce/cart/clear");
+        if (response.data.statusCode === 200) {
+          localStorage.setItem("tq", 0);
+          navigate(`/order-status`);
+          setLoading(false);
+        }
       } catch (error) {
         if (axios.isCancel(error)) {
           console.log("Request canceled", error.message);
@@ -194,11 +240,13 @@ const Checkout = () => {
           </div>
         </div>
       </div>
-      <SelectAddress
-        address={address}
-        onClose={handleCloseDialog}
-        changeAddrDialog={changeAddrDialog}
-      />
+      {addressid ? (
+        <SelectAddress
+          addressId={addressid}
+          onClose={handleCloseDialog}
+          changeAddrDialog={changeAddrDialog}
+        />
+      ) : null}
     </>
   );
 };

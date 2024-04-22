@@ -1,16 +1,16 @@
 import React, { useState, useContext, useEffect } from "react";
-import { AddressList } from "./index";
+import { AddressList } from "../components/index";
 import axios from "axios";
-import DeliveryAddressContext from "../context/deliveryAddress/DeliveryAddressContext";
 
-const SelectAddress = ({ changeAddrDialog, onClose }) => {
+const SelectAddress = ({ addressId, changeAddrDialog, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  //   const [selectedAddress, setSelectedAddress] = useState("");
+  const [selectedAddress, setSelectedAddress] = useState("");
   const [addressList, setAddressList] = useState([]);
 
   useEffect(() => {
     setAddressMenu();
+    setSelectedAddress(addressId);
   }, []);
 
   const setAddressMenu = () => {
@@ -22,7 +22,7 @@ const SelectAddress = ({ changeAddrDialog, onClose }) => {
           "/api/v1/ecommerce/addresses?page=1&limit=10"
         );
         setAddressList(response.data.data.addresses);
-        console.log("addressList", addressList);
+        // console.log("addressList", addressList);
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -36,10 +36,8 @@ const SelectAddress = ({ changeAddrDialog, onClose }) => {
   };
 
   const handleRadioChange = (id) => {
-    console.log("id", id);
-    setDeliveryAddress(id);
-    // const selectAddr = setDeliveryAddress(id);
-    onClose();
+    setSelectedAddress(id);
+    onClose(id);
   };
 
   return (
@@ -104,13 +102,13 @@ const SelectAddress = ({ changeAddrDialog, onClose }) => {
                       >
                         <div className="col-2">
                           {" "}
-                          {/* <input
+                          <input
                             type="radio"
                             id={address._id}
                             value={address._id}
                             checked={selectedAddress === address._id}
                             onChange={() => handleRadioChange(address._id)}
-                          /> */}
+                          />
                         </div>
                         <AddressList address={address} />
                       </div>

@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import LoggedInUserContext from "../context/loggedInUser/LoggedInUserContext";
-import DeliveryAddressContext from "../context/deliveryAddress/DeliveryAddressContext";
+
 const Login = ({ isDialogOpen, onClose }) => {
   const navigate = useNavigate();
   // const dispatch = useDispatch();
@@ -15,7 +15,6 @@ const Login = ({ isDialogOpen, onClose }) => {
   const [error, setError] = useState("");
   const [loginError, setLoginError] = useState("");
   const { setLoggedUser } = useContext(LoggedInUserContext);
-  // const { setDeliveryAddr } = useContext(DeliveryAddressContext);
 
   const onClose2 = () => {
     reset({});
@@ -34,7 +33,6 @@ const Login = ({ isDialogOpen, onClose }) => {
         localStorage.setItem("auth", response.data.data.accessToken);
         var authValue = localStorage.getItem("auth");
         setLoggedUser(authValue);
-        setDeliveryAddr(authValue);
         reset({});
       }
     } catch (error) {

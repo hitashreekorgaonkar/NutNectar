@@ -1,16 +1,10 @@
 import React, { useContext, useState, useEffect } from "react";
 import LoggedInUserContext from "../context/loggedInUser/LoggedInUserContext";
 import axios from "axios";
-import shoppingbag from "../assets/bag.png";
 import user from "../assets/user.png";
 import location from "../assets/location.png";
 import { useNavigate } from "react-router-dom";
-import {
-  AddressCard,
-  AddressForm,
-  OrdersList,
-  Profile,
-} from "../components/index";
+import { AddressCard, AddressForm, Profile } from "../components/index";
 
 const Account = () => {
   const [loading, setLoading] = useState(false);
