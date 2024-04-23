@@ -117,8 +117,8 @@ const Account = () => {
         setError(false);
         const response = await axios.post("/api/v1/users/logout");
         if (response.data.statusCode === 200) {
-          localStorage.removeItem("auth");
-          var authValue = localStorage.getItem("auth");
+          localStorage.removeItem("authToken");
+          var authValue = localStorage.getItem("authToken");
           setLoggedUser(authValue);
           navigate("/");
         }

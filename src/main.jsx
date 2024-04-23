@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
@@ -18,6 +18,7 @@ import Checkout from "./pages/Checkout.jsx";
 import OrderStatus from "./pages/OrderStatus.jsx";
 import Login from "./pages/Login.jsx";
 import Account from "./pages/Account.jsx";
+import { AuthLayout } from "./components/index.js";
 
 const router = createBrowserRouter([
   {
@@ -42,11 +43,19 @@ const router = createBrowserRouter([
       },
       {
         path: "cart",
-        element: <Cart />,
+        element: (
+          <AuthLayout>
+            <Cart />{" "}
+          </AuthLayout>
+        ),
       },
       {
         path: "account",
-        element: <Account />,
+        element: (
+          <AuthLayout>
+            <Account />{" "}
+          </AuthLayout>
+        ),
       },
     ],
   },

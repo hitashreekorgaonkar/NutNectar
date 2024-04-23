@@ -17,21 +17,31 @@ const Header = () => {
   const { setLoggedUser } = useContext(LoggedInUserContext);
   const { setTotalQuantity } = useContext(QuantityContext);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const handleOpenDialog = () => {
-    setIsDialogOpen(true);
-  };
 
   useEffect(() => {
-    var authValue = localStorage.getItem("auth");
+    var authValue = localStorage.getItem("authToken");
     setLoggedUser(authValue);
 
     var totqnty = localStorage.getItem("tq");
     setTotalQuantity(totqnty);
   }, []);
 
+  const handleOpenDialog = () => {
+    setIsDialogOpen(true);
+  };
+
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
   };
+
+  const removeAuthTokenAfterTime = (timeInSeconds) => {
+    setTimeout(() => {
+      localStorage.removeItem("authToken");
+      // You can also perform additional actions like redirecting the user or updating the state after removing the authToken
+    }, timeInSeconds * 1000); // Convert seconds to milliseconds
+  };
+
+  removeAuthTokenAfterTime(10 * 60);
 
   return (
     <>

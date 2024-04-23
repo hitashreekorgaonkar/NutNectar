@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 // import { login as authLogin } from "../store/authSlice";
 import { Button, Input2 } from "../components/index";
 import { useDispatch } from "react-redux";
-// import authService from "../appwrite/auth";
+// import authService from "../appwrite/authToken";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import LoggedInUserContext from "../context/loggedInUser/LoggedInUserContext";
@@ -30,8 +30,8 @@ const Login = ({ isDialogOpen, onClose }) => {
       if (response.data.statusCode === 200) {
         onClose();
         navigate("/");
-        localStorage.setItem("auth", response.data.data.accessToken);
-        var authValue = localStorage.getItem("auth");
+        localStorage.setItem("authToken", response.data.data.accessToken);
+        var authValue = localStorage.getItem("authToken");
         setLoggedUser(authValue);
         reset({});
       }

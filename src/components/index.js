@@ -11,6 +11,7 @@ import Profile from "./Profile";
 import Login from "../pages/Login";
 import Header from "../pages/Header";
 import Footer from "../pages/Footer";
+import AuthLayout from "./AuthLayout";
 
 export {
   Header,
@@ -18,6 +19,7 @@ export {
   //   Container,
   //   Logo,
   //   Signup,
+  AuthLayout,
   Login,
   Button,
   OrdersList,

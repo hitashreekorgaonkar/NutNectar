@@ -1,14 +1,31 @@
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import doeImg from "../assets/9488999.png";
 import doeImg2 from "../assets/cashew1.png";
 import doeImg3 from "../assets/almond1.png";
 import doeImg4 from "../assets/almond2.png";
 import doeImg5 from "../assets/almond3.png";
 import lgImg from "../assets/istockphoto3.jpg";
+import { Login } from "../components/index";
 // import lgImg from "../../assets/1000798_OIHFFD0.jpg";
 // import smImg from "../../assets/19962751_6202913.jpg";
 
 export default function Home() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  useEffect(() => {
+    var authValue = localStorage.getItem("authToken");
+    if (!authValue) {
+      handleOpenDialog();
+    }
+  }, []);
+
+  const handleOpenDialog = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
+
   return (
     <div className="">
       <div className="flex justify-center items-center bgPeach">
@@ -24,6 +41,7 @@ export default function Home() {
 
         {/* <img className="w-full hidden md:block" src={lgImg} alt="" /> */}
       </div>
+      <Login isDialogOpen={isDialogOpen} onClose={handleCloseDialog} />
     </div>
   );
 }
