@@ -3,20 +3,26 @@ import { Link, NavLink } from "react-router-dom";
 import rucksack from "../assets/icons8-rucksack-60.png";
 import img1 from "../assets/cart24.png";
 import user from "../assets/user.png";
-import QuantityContext from "../context/QuantityContext";
-import LoggedInUserContext from "../context/loggedInUser/LoggedInUserContext";
-import Login from "./Login";
-// import { useSelector } from "react-redux";
-// import axios from "axios";
+import {
+  Login,
+  authService,
+  LoggedInUserContext,
+  QuantityContext,
+} from "../components/index";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { logout } from "../store/authSlice";
 
 const Header = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const { totalQuantity } = useContext(QuantityContext);
   const { loggedUser } = useContext(LoggedInUserContext);
   const { setLoggedUser } = useContext(LoggedInUserContext);
   const { setTotalQuantity } = useContext(QuantityContext);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const authStatus = useSelector((state) => state.auth.status);
 
   useEffect(() => {
     var authValue = localStorage.getItem("authToken");
@@ -43,6 +49,12 @@ const Header = () => {
 
   removeAuthTokenAfterTime(10 * 60);
 
+  const navItems = [
+    { name: "Home", slug: "/" },
+    { name: "Store", slug: "/store" },
+    { name: "Contact Us", slug: "/contact" },
+  ];
+
   return (
     <>
       <header className="sticky z50 top-0">
@@ -51,46 +63,24 @@ const Header = () => {
             <img width="60" src={rucksack} alt="" />
           </Link>
           <ul className="flex font-semibold">
-            <li>
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  `${
-                    isActive ? "text-red-500" : "text-gray-700"
-                  } mx-[10px] cursor-pointer`
-                }
-              >
-                Home
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/store"
-                className={({ isActive }) =>
-                  `${
-                    isActive ? "text-red-500" : "text-gray-700"
-                  } mx-[10px] cursor-pointer`
-                }
-              >
-                Store
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/contact"
-                className={({ isActive }) =>
-                  `${
-                    isActive ? "text-red-500" : "text-gray-700"
-                  } mx-[10px] cursor-pointer`
-                }
-              >
-                Contact Us
-              </NavLink>
-            </li>
+            {navItems.map((item) => (
+              <li key={item.name}>
+                <NavLink
+                  to={item.slug}
+                  className={({ isActive }) =>
+                    `${
+                      isActive ? "text-red-500" : "text-gray-700"
+                    } mx-[10px] cursor-pointer`
+                  }
+                >
+                  {item.name}
+                </NavLink>
+              </li>
+            ))}
           </ul>
           <div className="flex justify-between items-center">
             {" "}
-            {!loggedUser && (
+            {!authStatus && (
               <div
                 onClick={handleOpenDialog}
                 className="px-1 sm:px-2 py-2 bg-indigo-700 text-white rounded font-bold cursor-pointer"
@@ -98,7 +88,7 @@ const Header = () => {
                 Login/Signup
               </div>
             )}
-            {loggedUser && (
+            {authStatus && (
               <Link to="/account">
                 <div className="cursor-pointer mr-4">
                   <img

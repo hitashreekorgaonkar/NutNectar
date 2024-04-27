@@ -4,7 +4,14 @@ import axios from "axios";
 import user from "../assets/user.png";
 import location from "../assets/location.png";
 import { useNavigate } from "react-router-dom";
-import { AddressCard, AddressForm, Profile } from "../components/index";
+import {
+  AddressCard,
+  AddressForm,
+  Profile,
+  authService,
+  logout as authLogout,
+} from "../components/index";
+import { useDispatch } from "react-redux";
 
 const Account = () => {
   const [loading, setLoading] = useState(false);
@@ -110,29 +117,32 @@ const Account = () => {
     setAddrTab();
   };
 
+  const dispatch = useDispatch();
   const logout = () => {
-    (async () => {
-      try {
-        setLoading(true);
-        setError(false);
-        const response = await axios.post("/api/v1/users/logout");
-        if (response.data.statusCode === 200) {
-          localStorage.removeItem("authToken");
-          var authValue = localStorage.getItem("authToken");
-          setLoggedUser(authValue);
-          navigate("/");
-        }
-
-        setLoading(false);
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          console.log("Request canceled", error.message);
-          return;
-        }
-        setError(true);
-        setLoading(false);
-      }
-    })();
+    authService.logout().then(() => {
+      dispatch(authLogout());
+    });
+    // (async () => {
+    //   try {
+    //     setLoading(true);
+    //     setError(false);
+    //     const response = await axios.post("/api/v1/users/logout");
+    //     if (response.data.statusCode === 200) {
+    //       localStorage.removeItem("authToken");
+    //       var authValue = localStorage.getItem("authToken");
+    //       setLoggedUser(authValue);
+    //       navigate("/");
+    //     }
+    //     setLoading(false);
+    //   } catch (error) {
+    //     if (axios.isCancel(error)) {
+    //       console.log("Request canceled", error.message);
+    //       return;
+    //     }
+    //     setError(true);
+    //     setLoading(false);
+    //   }
+    // })();
   };
 
   return (
@@ -179,7 +189,7 @@ const Account = () => {
               Profile
             </p>
             <p
-              onClick={() => logout()}
+              onClick={logout}
               className="text-lg text-center font-semibold border-t py-2 border-gray-500 cursor-pointer"
             >
               Log Out

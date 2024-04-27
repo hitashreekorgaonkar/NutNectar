@@ -78,11 +78,9 @@ const Input2 = React.forwardRef(function Input(
         )}
 
         <div className="flex justify-between">
-          {type == "password" && (
-            <p className="text-red-500 text-xs italic">
-              Please choose a password.
-            </p>
-          )}{" "}
+          <p className="text-red-500 text-xs italic">
+            {/* {type == "password" && <span>Please choose a password.</span>} */}
+          </p>{" "}
           {type == "password" && (
             <a
               className="font-bold text-sm text-indigo-600 hover:text-indigo-800 pt-1"

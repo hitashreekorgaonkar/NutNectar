@@ -11,6 +11,8 @@ import { Login } from "../components/index";
 
 export default function Home() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSignUpDialogOpen, setIsSignUpDialogOpen] = useState(false);
+
   useEffect(() => {
     var authValue = localStorage.getItem("authToken");
     if (!authValue) {
@@ -24,6 +26,12 @@ export default function Home() {
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
+  };
+
+  const handleOpenSignUpDialog = () => {
+    console.log("Open home", isSignUpDialogOpen, isDialogOpen);
+    setIsDialogOpen(false);
+    setIsSignUpDialogOpen(true);
   };
 
   return (
@@ -41,7 +49,11 @@ export default function Home() {
 
         {/* <img className="w-full hidden md:block" src={lgImg} alt="" /> */}
       </div>
-      <Login isDialogOpen={isDialogOpen} onClose={handleCloseDialog} />
+      {/* <Login
+        isDialogOpen={isDialogOpen}
+        onClose={handleCloseDialog}
+        onSignUp={handleOpenSignUpDialog}
+      /> */}
     </div>
   );
 }
