@@ -2,7 +2,8 @@ import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import parse from "html-react-parser";
-import QuantityContext from "../context/QuantityContext";
+import { QuantityContext } from "../components/index";
+import appwriteService from "../appwrite/config";
 
 const Product = () => {
   const navigate = useNavigate();
@@ -15,29 +16,46 @@ const Product = () => {
   const [productQuantity, setProductQuantity] = useState(1);
 
   useEffect(() => {
-    const controller = new AbortController();
-    // ;(async () => {  here ; is effie
-    (async () => {
-      try {
+    try {
+      if (productid) {
         setLoading(true);
         setError(false);
-        const response = await axios.get(
-          "/api/v1/ecommerce/products/" + productid
-        );
-        setProduct(response.data.data);
-        setLoading(false);
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          console.log("Request canceled", error.message);
-          return;
-        }
-        setError(true);
-        setLoading(false);
+        appwriteService.getProduct(productid).then((product) => {
+          console.log("product", product);
+          if (product) {
+            setProduct(product);
+            setLoading(false);
+          }
+        });
+      } else {
+        navigate("/");
       }
-    })();
+    } catch (error) {
+      setError(true);
+      setLoading(false);
+    }
+
+    // (async () => {
+    //   try {
+    //     setLoading(true);
+    //     setError(false);
+    //     const response = await axios.get(
+    //       "/api/v1/ecommerce/products/" + productid
+    //     );
+    //     setProduct(response.data.data);
+    //     setLoading(false);
+    //   } catch (error) {
+    //     if (axios.isCancel(error)) {
+    //       console.log("Request canceled", error.message);
+    //       return;
+    //     }
+    //     setError(true);
+    //     setLoading(false);
+    //   }
+    // })();
 
     getCart();
-  }, []);
+  }, [productid, navigate]);
 
   const addItem = () => {
     setProductQuantity(productQuantity + 1);
@@ -69,8 +87,8 @@ const Product = () => {
           console.log("Request canceled", error.message);
           return;
         }
-        setError(true);
-        setLoading(false);
+        // setError(true);
+        // setLoading(false);
       }
     })();
   };
@@ -94,8 +112,8 @@ const Product = () => {
           console.log("Request canceled", error.message);
           return;
         }
-        setError(true);
-        setLoading(false);
+        // setError(true);
+        // setLoading(false);
       }
     })();
   };
@@ -129,8 +147,8 @@ const Product = () => {
         <div className="col-span-6 md:col-span-3 flex justify-center">
           <img
             className="w-9/12 h-min"
-            src={product.mainImage?.url}
-            alt=""
+            src={product.mainImage}
+            alt={product.name}
             srcSet=""
           />
         </div>
