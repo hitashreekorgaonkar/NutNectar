@@ -2,7 +2,7 @@ import conf from "../conf/conf.js";
 import { Client, Databases, ID, Storage, Query } from "appwrite";
 
 export class Service {
-  clinet = new Client();
+  client = new Client();
   databases;
   bucket;
 
