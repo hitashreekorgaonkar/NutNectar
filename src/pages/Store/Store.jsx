@@ -7,7 +7,6 @@ import Card from "../../components/Card";
 import appwriteService from "../../appwrite/config";
 
 const Store = () => {
-  const [mainProducts, setMainProducts] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [minLength, setMinLength] = useState(21);
@@ -239,8 +238,8 @@ const Store = () => {
                 type="radio"
                 className="peer/butter"
                 name="prodType"
-                value="6575cae703e9443f2bad3410"
-                checked={categoryFilter === "6575cae703e9443f2bad3410"}
+                value="Butter"
+                checked={categoryFilter === "Butter"}
                 onChange={(e) => handleCategoryChange(e.target.value)}
               />
               <span className="ml-2">Butter</span>
@@ -251,8 +250,8 @@ const Store = () => {
                 type="radio"
                 className="peer/chikki"
                 name="prodType"
-                value="6575cb7803e9443f2bad3414"
-                checked={categoryFilter === "6575cb7803e9443f2bad3414"}
+                value="Chikki"
+                checked={categoryFilter === "Chikki"}
                 onChange={(e) => handleCategoryChange(e.target.value)}
               />
               <span className="ml-2">Chikki</span>
@@ -264,8 +263,8 @@ const Store = () => {
                 type="radio"
                 className="peer/oil"
                 name="prodType"
-                value="6575cb8b03e9443f2bad3418"
-                checked={categoryFilter === "6575cb8b03e9443f2bad3418"}
+                value="Oil"
+                checked={categoryFilter === "Oil"}
                 onChange={(e) => handleCategoryChange(e.target.value)}
               />
               <span className="ml-2">Oil</span>
