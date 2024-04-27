@@ -4,9 +4,9 @@ import "./Store.css";
 import img1 from "../../assets/dryfruitsBckg_5.png";
 import { setPrice } from "../../components/SetPrice";
 import Card from "../../components/Card";
+import appwriteService from "../../appwrite/config";
 
 const Store = () => {
-  const [products, setProducts] = useState([]);
   const [mainProducts, setMainProducts] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -14,33 +14,52 @@ const Store = () => {
   const [maxLength, setMaxLength] = useState(550);
   const [sortBy, setSortBy] = useState("bestSelling");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetchData();
+    // fetchData();
+    fetchProducts();
     setPrice();
   }, []);
 
-  const fetchData = async () => {
+  const fetchProducts = () => {
     try {
       setProducts([]);
       setLoading(true);
       setError(false);
-      const response = await axios.get(
-        "/api/v1/ecommerce/products?page=1&limit=15"
-      );
-      setMainProducts(response.data.data.products);
-      setProducts(response.data.data.products);
-
-      setLoading(false);
+      appwriteService.getProducts([]).then((products) => {
+        console.log("products", products);
+        if (products) {
+          setProducts(products.documents);
+          setLoading(false);
+        }
+      });
     } catch (error) {
-      if (axios.isCancel(error)) {
-        console.log("Request canceled", error.message);
-        return;
-      }
-      setError(true);
       setLoading(false);
+      setError(true);
     }
   };
+  // const fetchData = async () => {
+  //   try {
+  //     setProducts([]);
+  //     setLoading(true);
+  //     setError(false);
+  //     const response = await axios.get(
+  //       "/api/v1/ecommerce/products?page=1&limit=15"
+  //     );
+  //     setMainProducts(response.data.data.products);
+  //     setProducts(response.data.data.products);
+
+  //     setLoading(false);
+  //   } catch (error) {
+  //     if (axios.isCancel(error)) {
+  //       console.log("Request canceled", error.message);
+  //       return;
+  //     }
+  //     setError(true);
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleMinPriceChange = (event) => {
     setMinLength(event.target.value);
@@ -68,6 +87,7 @@ const Store = () => {
   };
 
   let sortedProducts = [...products];
+  console.log(sortedProducts, "sortedProducts");
   if (sortBy === "lowToHigh") {
     sortedProducts.sort((a, b) => a.price - b.price);
   } else if (sortBy === "highToLow") {
@@ -263,7 +283,7 @@ const Store = () => {
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 px-5">
             {sortedProducts.map((product) => (
-              <div className="" key={product._id}>
+              <div className="" key={product.$id}>
                 <Card {...product} />
               </div>
             ))}
