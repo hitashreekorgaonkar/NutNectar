@@ -37,7 +37,6 @@ const Login = ({ isDialogOpen, onClose }) => {
     setError("");
     try {
       const session = await authService.login(data);
-      console.log("session error", session);
       if (session) {
         const userData = await authService.getCurrentUser();
         if (userData) dispatch(authLogin(userData));
