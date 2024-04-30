@@ -10,6 +10,7 @@ import {
   Profile,
   authService,
   logout as authLogout,
+  QuantityContext,
 } from "../components/index";
 import { useDispatch } from "react-redux";
 
@@ -23,6 +24,7 @@ const Account = () => {
   const [profile, setProfile] = useState({});
   const [address, setAddress] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
+  const { setTotalQuantity } = useContext(QuantityContext);
 
   const { setLoggedUser } = useContext(LoggedInUserContext);
   const navigate = useNavigate();
@@ -121,6 +123,7 @@ const Account = () => {
   const logout = () => {
     authService.logout().then(() => {
       dispatch(authLogout());
+      setTotalQuantity(0);
     });
     // (async () => {
     //   try {

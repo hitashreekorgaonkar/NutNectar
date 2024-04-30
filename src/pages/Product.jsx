@@ -6,15 +6,15 @@ import { QuantityContext } from "../components/index";
 import appwriteService from "../appwrite/config";
 
 const Product = () => {
+  const userId = useSelector((state) => state.auth.userData.$id);
   const navigate = useNavigate();
   const { productid } = useParams();
   const { setTotalQuantity } = useContext(QuantityContext);
-
-  const [userId, setUserId] = useState("662ca90c0031f644baa3");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [product, setProduct] = useState({});
+  const [product, setProduct] = useState(null);
   const [productQuantity, setProductQuantity] = useState(1);
+  console.log("userId product", userId);
 
   useEffect(() => {
     try {
@@ -22,7 +22,7 @@ const Product = () => {
         setLoading(true);
         setError(false);
         appwriteService.getProduct(productid).then((product) => {
-          console.log("product", product);
+          // console.log("product", product);
           if (product) {
             setProduct(product);
             setLoading(false);
@@ -50,9 +50,10 @@ const Product = () => {
       setLoading(true);
       setError(false);
       appwriteService.findMany(userId, productid).then((productCardDet) => {
-        console.log("productCardDet", productCardDet.documents[0].quantity);
-        setProductQuantity(productCardDet.documents[0].quantity);
-        getCart();
+        if (productCardDet?.total != 0) {
+          setProductQuantity(productCardDet.documents[0].quantity);
+          getCart();
+        }
       });
       setLoading(false);
     } catch (error) {
@@ -70,11 +71,11 @@ const Product = () => {
       setLoading(true);
       setError(false);
       appwriteService.getCart(userId).then((items) => {
-        console.log("items", items.documents);
+        // console.log("items", items.documents);
         let tq = 0;
         items.documents.filter((x) => {
           tq += x.quantity;
-          console.log("documents x", tq);
+          // console.log("documents x", tq);
         });
         localStorage.setItem("tq", tq);
         var totqnty = localStorage.getItem("tq");
@@ -100,8 +101,8 @@ const Product = () => {
           userId,
           productid
         );
-        console.log("checkDocumentId", checkDocumentId);
-        console.log(".total == 0", checkDocumentId.total == 0);
+        // console.log("checkDocumentId", checkDocumentId);
+        // console.log(".total == 0", checkDocumentId.total == 0);
 
         if (checkDocumentId.total == 0) {
           const response = await appwriteService.addToCart({
@@ -109,7 +110,7 @@ const Product = () => {
             productid,
             quantity: productQuantity,
           });
-          console.log("addToCart response", response);
+          // console.log("addToCart response", response);
           if (response) getProdQty();
         } else {
           const response = await appwriteService.updateToCart(
@@ -119,7 +120,7 @@ const Product = () => {
             }
           );
           if (response) getProdQty();
-          console.log("updateToCart response", response);
+          // console.log("updateToCart response", response);
         }
 
         // getProdQty();
@@ -163,7 +164,7 @@ const Product = () => {
     <>
       {error && <h1 className="text-center mt-5">Something went wrong</h1>}
 
-      {loading ? (
+      {!product ? (
         <div className="my-5 text-center">
           <button
             type="button"
@@ -188,20 +189,20 @@ const Product = () => {
           <div className="col-span-6 md:col-span-3 flex justify-center">
             <img
               className="w-9/12 h-min"
-              src={product.mainImage?.url}
-              alt={product.name}
+              src={appwriteService.getFilePreview(product?.mainImage)}
+              alt={product?.name}
               srcSet=""
             />
           </div>
           <div className="col-span-6 md:col-span-3">
             <div className="">
-              <h1 className="text-3xl">{product.name}</h1>
+              <h1 className="text-3xl">{product?.name}</h1>
               <h1 className="text-2xl py-4">
-                {product.price && <span>₹</span>} {product.price}
+                {product?.price && <span>₹</span>} {product?.price}
               </h1>
-              {/* <div className="">{product.description}</div> */}
-              {product.price && (
-                <div className="">{parse(product.description)}</div>
+              {/* <div className="">{product?.description}</div> */}
+              {product?.price && (
+                <div className="">{parse(product?.description)}</div>
               )}
             </div>
             <div className="col-span-6 md:col-span-3 my-3">
@@ -219,7 +220,7 @@ const Product = () => {
                 </div>
                 <button
                   onClick={() => addItem()}
-                  disabled={productQuantity >= product.stock}
+                  disabled={productQuantity >= product?.stock}
                   type="button"
                   className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 disabled:bg-gray-100"
                 >

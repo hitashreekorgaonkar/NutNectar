@@ -53,11 +53,12 @@ export class Service {
     }
   }
 
-  async getCart() {
+  async getCart(userId) {
     try {
       return await this.databases.listDocuments(
         conf.appwriteDatabaseId,
-        conf.appwriteCartCollectionId
+        conf.appwriteCartCollectionId,
+        [Query.equal("userId", userId)]
       );
     } catch (error) {
       console.log("Appwrite service :: getPost :: error", error);
@@ -121,6 +122,10 @@ export class Service {
       console.log("Appwrite service :: deleteAll :: error", error);
       return false;
     }
+  }
+
+  getFilePreview(fileId) {
+    return this.bucket.getFilePreview(conf.appwriteBucketId, fileId);
   }
 }
 

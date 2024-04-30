@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
 import QuantityContext from "../context/QuantityContext";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import appwriteService from "../appwrite/config";
+import { useSelector } from "react-redux";
 
 const Cart = () => {
   const [loading, setLoading] = useState(false);
@@ -12,7 +12,8 @@ const Cart = () => {
   const { setTotalQuantity } = useContext(QuantityContext);
   const [cartTotal, setCartTotal] = useState();
   const navigate = useNavigate();
-  const [userId, setUserId] = useState("662ca90c0031f644baa3");
+  const userId = useSelector((state) => state?.auth?.userData?.$id);
+  console.log("userId cart", userId);
 
   useEffect(() => {
     getCart();
@@ -93,8 +94,9 @@ const Cart = () => {
         setError(false);
         for (const document of cart) {
           const response = await appwriteService.deleteAll(document.$id);
+          console.log("response ", response.message == "");
           if (response.message == "") {
-            getCart();
+            setCart([]);
             localStorage.setItem("tq", 0);
             setTotalQuantity(0);
           }
@@ -111,9 +113,9 @@ const Cart = () => {
     })();
   };
 
-  if (cart.length) {
+  if (cart?.length) {
     let tq = 0;
-    cart.filter((x) => (tq += x.quantity));
+    cart?.filter((x) => (tq += x.quantity));
     localStorage.setItem("tq", tq);
     var totqnty = localStorage.getItem("tq");
     setTotalQuantity(totqnty);
@@ -130,7 +132,7 @@ const Cart = () => {
           <div className="text-center">Quantity</div>
           <div className="col-span-2 text-center">Total</div>
         </div>
-        {cart.map((item) => (
+        {cart?.map((item) => (
           // <Link to={`/product/${item.product.$id}`}>
           <div className="grid grid-cols-9 border-t-2" key={item.product.$id}>
             <div className="col-span-1">
@@ -192,7 +194,7 @@ const Cart = () => {
           </div>
           // </Link>
         ))}
-        {cart.length != 0 && (
+        {cart?.length != 0 && (
           <div className="flex justify-center items-center">
             <div
               onClick={() => clearCart()}
@@ -203,7 +205,7 @@ const Cart = () => {
           </div>
         )}
 
-        {cart.length != 0 && (
+        {cart?.length != 0 && (
           <div className="grid grid-cols-3 my-8 ">
             <div className="col-span-2">
               {/* <p className="text-xl">Additional Comments</p>

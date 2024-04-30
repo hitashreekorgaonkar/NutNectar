@@ -27,7 +27,7 @@ const Store = () => {
       setLoading(true);
       setError(false);
       appwriteService.getProducts([]).then((products) => {
-        console.log("products", products);
+        // console.log("products", products);
         if (products) {
           setProducts(products.documents);
           setLoading(false);
@@ -86,7 +86,7 @@ const Store = () => {
   };
 
   let sortedProducts = [...products];
-  console.log(sortedProducts, "sortedProducts");
+  // console.log(sortedProducts, "sortedProducts");
   if (sortBy === "lowToHigh") {
     sortedProducts.sort((a, b) => a.price - b.price);
   } else if (sortBy === "highToLow") {

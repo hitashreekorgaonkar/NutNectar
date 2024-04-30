@@ -8,11 +8,13 @@ import lgImg from "../assets/istockphoto3.jpg";
 import { Login } from "../components/index";
 // import lgImg from "../../assets/1000798_OIHFFD0.jpg";
 // import smImg from "../../assets/19962751_6202913.jpg";
+import { useSelector } from "react-redux";
 
 export default function Home() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSignUpDialogOpen, setIsSignUpDialogOpen] = useState(false);
-
+  const userId = useSelector((state) => state.auth.userData);
+  console.log("userId cart", userId);
   useEffect(() => {
     var authValue = localStorage.getItem("authToken");
     if (!authValue) {

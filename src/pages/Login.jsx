@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button, Input2 } from "../components/index";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
+
 import axios from "axios";
 import {
   authService,
@@ -39,7 +40,13 @@ const Login = ({ isDialogOpen, onClose }) => {
       const session = await authService.login(data);
       if (session) {
         const userData = await authService.getCurrentUser();
-        if (userData) dispatch(authLogin(userData));
+
+        if (userData) {
+          dispatch(authLogin(userData));
+          localStorage.setItem("userID", JSON.stringify(userData.$id));
+          console.log("log userData", userData);
+          console.log("log userData $id", userData.$id);
+        }
         navigate("/");
         onSignUpCreate();
       }
