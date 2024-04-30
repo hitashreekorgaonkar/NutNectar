@@ -3,6 +3,7 @@ import axios from "axios";
 import QuantityContext from "../context/QuantityContext";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import appwriteService from "../appwrite/config";
 
 const Cart = () => {
   const [loading, setLoading] = useState(false);
@@ -11,46 +12,49 @@ const Cart = () => {
   const { setTotalQuantity } = useContext(QuantityContext);
   const [cartTotal, setCartTotal] = useState();
   const navigate = useNavigate();
+  const [userId, setUserId] = useState("662ca90c0031f644baa3");
 
   useEffect(() => {
-    const controller = new AbortController();
-    // ;(async () => {  here ; is effie
-    (async () => {
-      try {
-        setLoading(true);
-        setError(false);
-        const response = await axios.get("/api/v1/ecommerce/cart");
-        setCart(response.data.data.items);
-        setCartTotal(response.data.data.cartTotal);
-        setLoading(false);
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          console.log("Request canceled", error.message);
-          return;
-        }
-        setError(true);
-        setLoading(false);
-      }
-    })();
+    getCart();
   }, []);
+
+  const getCart = () => {
+    try {
+      setLoading(true);
+      setError(false);
+      appwriteService.getCart(userId).then((items) => {
+        // console.log("items", items.documents);
+        setCart(items.documents);
+        let totalPrice = items.documents.reduce((total, item) => {
+          return total + item.quantity * item.product.price;
+        }, 0);
+        setCartTotal(totalPrice);
+        // console.log(totalPrice);
+        setLoading(false);
+      });
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log("Request canceled", error.message);
+        return;
+      }
+      setError(true);
+      setLoading(false);
+    }
+  };
 
   const checkOut = (cart, cartTotal) => {
     navigate(`/checkout`, { state: { cart, cartTotal } });
   };
 
-  const addToCart = (totalItems, productid) => {
+  const addToCart = (totalItems, documentId) => {
     (async () => {
       try {
         setLoading(true);
         setError(false);
-        const response = await axios.post(
-          "/api/v1/ecommerce/cart/item/" + productid,
-          {
-            quantity: totalItems,
-          }
-        );
-        setCart(response.data.data.items);
-        setCartTotal(response.data.data.cartTotal);
+        await appwriteService.updateToCart(documentId, {
+          quantity: totalItems,
+        });
+        getCart();
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -63,16 +67,13 @@ const Cart = () => {
     })();
   };
 
-  const deleteItem = (productid) => {
+  const deleteItem = (documentId) => {
     (async () => {
       try {
         setLoading(true);
         setError(false);
-        const response = await axios.delete(
-          "/api/v1/ecommerce/cart/item/" + productid
-        );
-        setCart(response.data.data.items);
-        setCartTotal(response.data.data.cartTotal);
+        const response = await appwriteService.delete(documentId);
+        if (response.message == "") getCart();
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -90,14 +91,15 @@ const Cart = () => {
       try {
         setLoading(true);
         setError(false);
-        const response = await axios.delete("/api/v1/ecommerce/cart/clear");
-        setCart([]);
-        setCartTotal(response.data.data.cartTotal);
-        localStorage.setItem("tq", 0);
-        // var totqnty = localStorage.getItem("tq");
-        // setTotalQuantity(totqnty);
-        setTotalQuantity(0);
-        setLoading(false);
+        for (const document of cart) {
+          const response = await appwriteService.deleteAll(document.$id);
+          if (response.message == "") {
+            getCart();
+            localStorage.setItem("tq", 0);
+            setTotalQuantity(0);
+          }
+          setLoading(false);
+        }
       } catch (error) {
         if (axios.isCancel(error)) {
           console.log("Request canceled", error.message);
@@ -115,7 +117,6 @@ const Cart = () => {
     localStorage.setItem("tq", tq);
     var totqnty = localStorage.getItem("tq");
     setTotalQuantity(totqnty);
-    // setTotalQuantity(tq);
   }
 
   return (
@@ -130,8 +131,8 @@ const Cart = () => {
           <div className="col-span-2 text-center">Total</div>
         </div>
         {cart.map((item) => (
-          // <Link to={`/product/${item.product._id}`}>
-          <div className="grid grid-cols-9 border-t-2" key={item.product._id}>
+          // <Link to={`/product/${item.product.$id}`}>
+          <div className="grid grid-cols-9 border-t-2" key={item.product.$id}>
             <div className="col-span-1">
               <img
                 className=" my-2 border"
@@ -148,7 +149,7 @@ const Cart = () => {
               <div className="inline-flex rounded-md shadow-sm" role="group">
                 <button
                   type="button"
-                  onClick={() => addToCart(item.quantity - 1, item.product._id)}
+                  onClick={() => addToCart(item.quantity - 1, item.$id)}
                   disabled={item.quantity == 1}
                   className="px-1 lg:px-2 xl:px-4 md:py-2 text-sm md:font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 disabled:bg-gray-100"
                 >
@@ -159,7 +160,7 @@ const Cart = () => {
                 </div>
                 <button
                   type="button"
-                  onClick={() => addToCart(item.quantity + 1, item.product._id)}
+                  onClick={() => addToCart(item.quantity + 1, item.$id)}
                   className="px-1 lg:px-2 xl:px-4 md:py-2 text-sm md:font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 disabled:bg-gray-100"
                   disabled={item.quantity >= item.product.stock}
                 >
@@ -169,7 +170,7 @@ const Cart = () => {
             </div>
             <div className="col-span-2 content-center">
               <svg
-                onClick={() => deleteItem(item.product._id)}
+                onClick={() => deleteItem(item.$id)}
                 className="w-6 h-6 text-red-500 hover:text-black float-right"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

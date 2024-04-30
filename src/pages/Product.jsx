@@ -10,6 +10,7 @@ const Product = () => {
   const { productid } = useParams();
   const { setTotalQuantity } = useContext(QuantityContext);
 
+  const [userId, setUserId] = useState("662ca90c0031f644baa3");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [product, setProduct] = useState({});
@@ -34,27 +35,7 @@ const Product = () => {
       setError(true);
       setLoading(false);
     }
-
-    // (async () => {
-    //   try {
-    //     setLoading(true);
-    //     setError(false);
-    //     const response = await axios.get(
-    //       "/api/v1/ecommerce/products/" + productid
-    //     );
-    //     setProduct(response.data.data);
-    //     setLoading(false);
-    //   } catch (error) {
-    //     if (axios.isCancel(error)) {
-    //       console.log("Request canceled", error.message);
-    //       return;
-    //     }
-    //     setError(true);
-    //     setLoading(false);
-    //   }
-    // })();
-
-    getCart();
+    getProdQty();
   }, [productid, navigate]);
 
   const addItem = () => {
@@ -64,33 +45,50 @@ const Product = () => {
     setProductQuantity(productQuantity - 1);
   };
 
-  const getCart = () => {
-    (async () => {
-      try {
-        setLoading(true);
-        setError(false);
-        const response = await axios.get("/api/v1/ecommerce/cart");
-        const pq = response.data.data.items.filter(
-          (item) => item.product._id === productid
-        )[0].quantity;
-        setProductQuantity(pq);
-        if (response.data.data.items.length) {
-          let tq = 0;
-          response.data.data.items.filter((x) => (tq += x.quantity));
-          localStorage.setItem("tq", tq);
-          var totqnty = localStorage.getItem("tq");
-          setTotalQuantity(totqnty);
-        }
-        setLoading(false);
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          console.log("Request canceled", error.message);
-          return;
-        }
-        // setError(true);
-        // setLoading(false);
+  const getProdQty = () => {
+    try {
+      setLoading(true);
+      setError(false);
+      appwriteService.findMany(userId, productid).then((productCardDet) => {
+        console.log("productCardDet", productCardDet.documents[0].quantity);
+        setProductQuantity(productCardDet.documents[0].quantity);
+        getCart();
+      });
+      setLoading(false);
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log("Request canceled", error.message);
+        return;
       }
-    })();
+      // setError(true);
+      // setLoading(false);
+    }
+  };
+
+  const getCart = () => {
+    try {
+      setLoading(true);
+      setError(false);
+      appwriteService.getCart(userId).then((items) => {
+        console.log("items", items.documents);
+        let tq = 0;
+        items.documents.filter((x) => {
+          tq += x.quantity;
+          console.log("documents x", tq);
+        });
+        localStorage.setItem("tq", tq);
+        var totqnty = localStorage.getItem("tq");
+        setTotalQuantity(totqnty);
+        setLoading(false);
+      });
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log("Request canceled", error.message);
+        return;
+      }
+      setError(true);
+      setLoading(false);
+    }
   };
 
   const addToCart = (buyNow) => {
@@ -98,13 +96,33 @@ const Product = () => {
       try {
         setLoading(true);
         setError(false);
-        const response = await axios.post(
-          "/api/v1/ecommerce/cart/item/" + productid,
-          {
-            quantity: productQuantity,
-          }
+        const checkDocumentId = await appwriteService.findMany(
+          userId,
+          productid
         );
-        getCart();
+        console.log("checkDocumentId", checkDocumentId);
+        console.log(".total == 0", checkDocumentId.total == 0);
+
+        if (checkDocumentId.total == 0) {
+          const response = await appwriteService.addToCart({
+            userId,
+            productid,
+            quantity: productQuantity,
+          });
+          console.log("addToCart response", response);
+          if (response) getProdQty();
+        } else {
+          const response = await appwriteService.updateToCart(
+            checkDocumentId.documents[0].$id,
+            {
+              quantity: productQuantity,
+            }
+          );
+          if (response) getProdQty();
+          console.log("updateToCart response", response);
+        }
+
+        // getProdQty();
         buyNow ? navigate("/cart") : "";
         setLoading(false);
       } catch (error) {
@@ -113,14 +131,39 @@ const Product = () => {
           return;
         }
         // setError(true);
-        // setLoading(false);
+        setLoading(false);
       }
     })();
+
+    // (async () => {
+    //   try {
+    //     setLoading(true);
+    //     setError(false);
+    //     const response = await axios.post(
+    //       "/api/v1/ecommerce/cart/item/" + productid,
+    //       {
+    //         quantity: productQuantity,
+    //       }
+    //     );
+    //     getProdQty();
+    //     buyNow ? navigate("/cart") : "";
+    //     setLoading(false);
+    //   } catch (error) {
+    //     if (axios.isCancel(error)) {
+    //       console.log("Request canceled", error.message);
+    //       return;
+    //     }
+    //     // setError(true);
+    //     // setLoading(false);
+    //   }
+    // })();
   };
 
   return (
     <>
-      {loading && (
+      {error && <h1 className="text-center mt-5">Something went wrong</h1>}
+
+      {loading ? (
         <div className="my-5 text-center">
           <button
             type="button"
@@ -138,72 +181,71 @@ const Product = () => {
             Loading...
           </button>
         </div>
-      )}
-      {error && <h1 className="text-center mt-5">Something went wrong</h1>}
+      ) : (
+        <div className="container mx-auto grid grid-cols-6 p-4">
+          {/* {loading && <h1>Loading ...</h1>} */}
 
-      <div className="container mx-auto grid grid-cols-6 p-4">
-        {/* {loading && <h1>Loading ...</h1>} */}
-
-        <div className="col-span-6 md:col-span-3 flex justify-center">
-          <img
-            className="w-9/12 h-min"
-            src={product.mainImage}
-            alt={product.name}
-            srcSet=""
-          />
-        </div>
-        <div className="col-span-6 md:col-span-3">
-          <div className="">
-            <h1 className="text-3xl">{product.name}</h1>
-            <h1 className="text-2xl py-4">
-              {product.price && <span>₹</span>} {product.price}
-            </h1>
-            {/* <div className="">{product.description}</div> */}
-            {product.price && (
-              <div className="">{parse(product.description)}</div>
-            )}
+          <div className="col-span-6 md:col-span-3 flex justify-center">
+            <img
+              className="w-9/12 h-min"
+              src={product.mainImage?.url}
+              alt={product.name}
+              srcSet=""
+            />
           </div>
-          <div className="col-span-6 md:col-span-3 my-3">
-            <div className="inline-flex rounded-md shadow-sm" role="group">
-              <button
-                onClick={() => removeItem()}
-                disabled={productQuantity == 1}
-                type="button"
-                className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 disabled:bg-gray-100"
-              >
-                -
-              </button>
-              <div className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200">
-                {productQuantity}
+          <div className="col-span-6 md:col-span-3">
+            <div className="">
+              <h1 className="text-3xl">{product.name}</h1>
+              <h1 className="text-2xl py-4">
+                {product.price && <span>₹</span>} {product.price}
+              </h1>
+              {/* <div className="">{product.description}</div> */}
+              {product.price && (
+                <div className="">{parse(product.description)}</div>
+              )}
+            </div>
+            <div className="col-span-6 md:col-span-3 my-3">
+              <div className="inline-flex rounded-md shadow-sm" role="group">
+                <button
+                  onClick={() => removeItem()}
+                  disabled={productQuantity == 1}
+                  type="button"
+                  className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 disabled:bg-gray-100"
+                >
+                  -
+                </button>
+                <div className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200">
+                  {productQuantity}
+                </div>
+                <button
+                  onClick={() => addItem()}
+                  disabled={productQuantity >= product.stock}
+                  type="button"
+                  className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 disabled:bg-gray-100"
+                >
+                  +
+                </button>
               </div>
+            </div>
+            <div className="col-span-6 md:col-span-3">
               <button
-                onClick={() => addItem()}
-                disabled={productQuantity >= product.stock}
-                type="button"
-                className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 disabled:bg-gray-100"
+                type="submit"
+                onClick={() => addToCart()}
+                className="rounded-0 h-12 w-40 mr-3 bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-white hover:text-black border-2 border-black"
               >
-                +
+                ADD TO CART
+              </button>
+              <button
+                onClick={() => addToCart("buyNow")}
+                type="submit"
+                className="rounded-0 h-12 w-40 bg-white px-3 py-2 text-sm font-semibold text-black shadow-sm hover:bg-black hover:text-white border-2 border-black"
+              >
+                BUY NOW
               </button>
             </div>
           </div>
-          <div className="col-span-6 md:col-span-3">
-            <button
-              type="submit"
-              onClick={() => addToCart()}
-              className="rounded-0 h-12 w-40 mr-3 bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-white hover:text-black border-2 border-black"
-            >
-              ADD TO CART
-            </button>
-            <button
-              onClick={() => addToCart("buyNow")}
-              type="submit"
-              className="rounded-0 h-12 w-40 bg-white px-3 py-2 text-sm font-semibold text-black shadow-sm hover:bg-black hover:text-white border-2 border-black"
-            >
-              BUY NOW
-            </button>
-          </div>
         </div>
-      </div>
+      )}
     </>
   );
 };
