@@ -4,19 +4,23 @@ import axios from "axios";
 import parse from "html-react-parser";
 import { QuantityContext } from "../components/index";
 import appwriteService from "../appwrite/config";
+import { useSelector } from "react-redux";
 
 const Product = () => {
-  const userId = useSelector((state) => state.auth.userData.$id);
+  // const userId = useSelector((state) => state.auth.userData.$id);
   const navigate = useNavigate();
   const { productid } = useParams();
   const { setTotalQuantity } = useContext(QuantityContext);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [product, setProduct] = useState(null);
+  const [userId, setUserID] = useState("");
   const [productQuantity, setProductQuantity] = useState(1);
-  console.log("userId product", userId);
+  // console.log("userId product", userId);
 
   useEffect(() => {
+    const userId = JSON.parse(localStorage.getItem("userID"));
+    setUserID(userId);
     try {
       if (productid) {
         setLoading(true);
@@ -35,7 +39,7 @@ const Product = () => {
       setError(true);
       setLoading(false);
     }
-    getProdQty();
+    getProdQty(userId);
   }, [productid, navigate]);
 
   const addItem = () => {
@@ -45,14 +49,15 @@ const Product = () => {
     setProductQuantity(productQuantity - 1);
   };
 
-  const getProdQty = () => {
+  const getProdQty = (userId) => {
     try {
       setLoading(true);
       setError(false);
+
       appwriteService.findMany(userId, productid).then((productCardDet) => {
         if (productCardDet?.total != 0) {
           setProductQuantity(productCardDet.documents[0].quantity);
-          getCart();
+          getCart(userId);
         }
       });
       setLoading(false);
@@ -66,7 +71,7 @@ const Product = () => {
     }
   };
 
-  const getCart = () => {
+  const getCart = (userId) => {
     try {
       setLoading(true);
       setError(false);
@@ -111,7 +116,7 @@ const Product = () => {
             quantity: productQuantity,
           });
           // console.log("addToCart response", response);
-          if (response) getProdQty();
+          if (response) getProdQty(userId);
         } else {
           const response = await appwriteService.updateToCart(
             checkDocumentId.documents[0].$id,
@@ -119,7 +124,7 @@ const Product = () => {
               quantity: productQuantity,
             }
           );
-          if (response) getProdQty();
+          if (response) getProdQty(userId);
           // console.log("updateToCart response", response);
         }
 

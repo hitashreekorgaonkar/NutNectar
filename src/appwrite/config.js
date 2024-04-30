@@ -41,6 +41,7 @@ export class Service {
   }
 
   async findMany(userId, productid) {
+    console.log("userId, productid", userId, productid);
     try {
       return await this.databases.listDocuments(
         conf.appwriteDatabaseId,

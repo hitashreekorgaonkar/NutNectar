@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import appwriteService from "../appwrite/config";
 import { useSelector } from "react-redux";
+import axios from "axios";
 
 const Cart = () => {
   const [loading, setLoading] = useState(false);
@@ -12,14 +13,16 @@ const Cart = () => {
   const { setTotalQuantity } = useContext(QuantityContext);
   const [cartTotal, setCartTotal] = useState();
   const navigate = useNavigate();
-  const userId = useSelector((state) => state?.auth?.userData?.$id);
-  console.log("userId cart", userId);
+  // const userId = useSelector((state) => state?.auth?.userData?.$id);
+  // console.log("userId cart", userId);
 
   useEffect(() => {
-    getCart();
+    const userId = JSON.parse(localStorage.getItem("userID"));
+    console.log("userId cart", userId);
+    if (userId) getCart(userId);
   }, []);
 
-  const getCart = () => {
+  const getCart = async (userId) => {
     try {
       setLoading(true);
       setError(false);
@@ -55,7 +58,7 @@ const Cart = () => {
         await appwriteService.updateToCart(documentId, {
           quantity: totalItems,
         });
-        getCart();
+        getCart(userId);
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -74,7 +77,7 @@ const Cart = () => {
         setLoading(true);
         setError(false);
         const response = await appwriteService.delete(documentId);
-        if (response.message == "") getCart();
+        if (response.message == "") getCart(userId);
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {

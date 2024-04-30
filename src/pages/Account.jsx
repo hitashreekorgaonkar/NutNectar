@@ -124,6 +124,7 @@ const Account = () => {
     authService.logout().then(() => {
       dispatch(authLogout());
       setTotalQuantity(0);
+      localStorage.removeItem("userID");
     });
     // (async () => {
     //   try {
