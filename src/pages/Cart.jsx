@@ -13,16 +13,17 @@ const Cart = () => {
   const { setTotalQuantity } = useContext(QuantityContext);
   const [cartTotal, setCartTotal] = useState();
   const navigate = useNavigate();
+  const [userId, setUserID] = useState(
+    JSON.parse(localStorage.getItem("userID"))
+  );
+
   // const userId = useSelector((state) => state?.auth?.userData?.$id);
-  // console.log("userId cart", userId);
 
   useEffect(() => {
-    const userId = JSON.parse(localStorage.getItem("userID"));
-    console.log("userId cart", userId);
-    if (userId) getCart(userId);
-  }, []);
+    if (userId) getCart();
+  }, [userId]);
 
-  const getCart = async (userId) => {
+  const getCart = async () => {
     try {
       setLoading(true);
       setError(false);
@@ -33,7 +34,6 @@ const Cart = () => {
           return total + item.quantity * item.product.price;
         }, 0);
         setCartTotal(totalPrice);
-        // console.log(totalPrice);
         setLoading(false);
       });
     } catch (error) {
@@ -58,7 +58,7 @@ const Cart = () => {
         await appwriteService.updateToCart(documentId, {
           quantity: totalItems,
         });
-        getCart(userId);
+        getCart();
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -76,9 +76,12 @@ const Cart = () => {
       try {
         setLoading(true);
         setError(false);
-        const response = await appwriteService.delete(documentId);
-        if (response.message == "") getCart(userId);
+        await appwriteService.delete(documentId);
+        // console.log("response", response);
+        // if (response.message === "") {
+        getCart();
         setLoading(false);
+        // }
       } catch (error) {
         if (axios.isCancel(error)) {
           console.log("Request canceled", error.message);
@@ -96,14 +99,13 @@ const Cart = () => {
         setLoading(true);
         setError(false);
         for (const document of cart) {
-          const response = await appwriteService.deleteAll(document.$id);
-          console.log("response ", response.message == "");
-          if (response.message == "") {
-            setCart([]);
-            localStorage.setItem("tq", 0);
-            setTotalQuantity(0);
-          }
+          await appwriteService.deleteAll(document.$id);
+          // if (response.message == "") {
+          setCart([]);
+          localStorage.setItem("tq", 0);
+          setTotalQuantity(0);
           setLoading(false);
+          // }
         }
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -141,8 +143,9 @@ const Cart = () => {
             <div className="col-span-1">
               <img
                 className=" my-2 border"
-                src={item.product.mainImage.url}
-                alt=""
+                // src={item.product.mainImage}
+                src={appwriteService.getFilePreview(item.product?.mainImage)}
+                alt={item.product?.name}
                 srcSet=""
               />
             </div>
