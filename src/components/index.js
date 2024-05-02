@@ -20,6 +20,7 @@ import QuantityContext from "../context/QuantityContext";
 import LoggedInUserContextProvider from "../context/loggedInUser/LoggedInUserContextProvider";
 import LoggedInUserContext from "../context/loggedInUser/LoggedInUserContext";
 import authService from "../appwrite/auth";
+import appwriteService from "../appwrite/config";
 import Home from "../pages/Home.jsx";
 import Store from "../pages/Store/Store.jsx";
 import Product from "../pages/Product.jsx";
@@ -59,6 +60,7 @@ export {
   QuantityContext,
   LoggedInUserContext,
   authService,
+  appwriteService,
   login,
   logout,
 };

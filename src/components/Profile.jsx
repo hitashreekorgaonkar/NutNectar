@@ -1,24 +1,20 @@
 import React, { useState } from "react";
-import { Button, Input2 } from "./index";
+import { Button, Input2, authService } from "./index";
 import axios from "axios";
 const Profile = ({ profile }) => {
   const [error, setError] = useState(false);
-  const [firstName, setFirstName] = useState(profile.firstName);
-  const [lastName, setLastName] = useState(profile.lastName);
-  const [phoneNumber, setPhoneNumber] = useState(profile.phoneNumber);
+  const [name, setName] = useState(profile.name);
 
   const updateProfile = async () => {
     setError("");
     try {
-      const response = await axios.patch("/api/v1/ecommerce/profile", {
-        countryCode: "+91",
-        firstName: firstName,
-        lastName: lastName,
-        phoneNumber: phoneNumber,
+      const response = await authService.updateName({
+        name,
       });
-      if (response.data.statusCode === 200) {
-        // setFirstName(response.data.data.firstName);
-      }
+      console.log("response", response);
+      // if (response.data.statusCode === 200) {
+      // setName(response.data.data.name);
+      // }
     } catch (error) {
       console.log("error", error);
       setError(error.message);
@@ -43,28 +39,20 @@ const Profile = ({ profile }) => {
             <div className="grid grid-cols-4 gap-6">
               <div className="col-span-4">
                 <Input2
-                  label="First Name"
+                  label="Name"
                   labelclassname="text-indigo-700"
-                  value={firstName || ""}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  value={name || ""}
+                  onChange={(e) => setName(e.target.value)}
                 ></Input2>
               </div>
-              <div className="col-span-4">
-                <Input2
-                  label="Last Name"
-                  labelclassname="text-indigo-700"
-                  value={lastName || ""}
-                  onChange={(e) => setLastName(e.target.value)}
-                ></Input2>{" "}
-              </div>
-              <div className="col-span-4">
+              {/* <div className="col-span-4">
                 <Input2
                   label="Phone Number"
                   labelclassname="text-indigo-700"
                   value={phoneNumber || ""}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                 ></Input2>{" "}
-              </div>
+              </div> */}
               <div className="col-span-4">
                 <Button
                   type="submit"

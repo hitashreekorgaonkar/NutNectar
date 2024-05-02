@@ -11,6 +11,7 @@ import {
   authService,
   logout as authLogout,
   QuantityContext,
+  appwriteService,
 } from "../components/index";
 import { useDispatch } from "react-redux";
 
@@ -25,7 +26,9 @@ const Account = () => {
   const [address, setAddress] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
   const { setTotalQuantity } = useContext(QuantityContext);
-
+  const [userId, setUserID] = useState(
+    JSON.parse(localStorage.getItem("userID"))
+  );
   const { setLoggedUser } = useContext(LoggedInUserContext);
   const navigate = useNavigate();
 
@@ -37,8 +40,8 @@ const Account = () => {
   };
 
   useEffect(() => {
-    setAddressMenu();
     setProfileUser();
+    setAddressMenu();
   }, []);
 
   const setAddressMenu = () => {
@@ -46,10 +49,8 @@ const Account = () => {
       try {
         setLoading(true);
         setError(false);
-        const response = await axios.get(
-          "/api/v1/ecommerce/addresses?page=1&limit=10"
-        );
-        setAddressList(response.data.data.addresses);
+        const response = await appwriteService.getAddresses(userId);
+        setAddressList(response.documents);
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -67,8 +68,10 @@ const Account = () => {
       try {
         setLoading(true);
         setError(false);
-        const response = await axios.get("/api/v1/ecommerce/profile");
-        setProfile(response.data.data);
+        // const response = await axios.get("/api/v1/ecommerce/profile");
+        const userData = await authService.getCurrentUser();
+        // console.log("1 userData", userData);
+        setProfile(userData);
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -89,8 +92,10 @@ const Account = () => {
       try {
         setLoading(true);
         setError(false);
-        const response = await axios.get("/api/v1/ecommerce/profile");
-        setProfile(response.data.data);
+        // const response = await axios.get("/api/v1/ecommerce/profile");
+        const userData = await authService.getCurrentUser();
+        // console.log("2 userData", userData);
+        setProfile(userData);
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -212,8 +217,8 @@ const Account = () => {
                   </div>
                 </div>
                 <p className="border-b mx-5"></p>
-                {addressList.map((address) => (
-                  <div key={address._id}>
+                {addressList?.map((address) => (
+                  <div key={address?.$id}>
                     <AddressCard
                       address={address}
                       handleEdit={handleEdit}
@@ -231,6 +236,7 @@ const Account = () => {
         </div>
       </div>
       <AddressForm
+        profileID={profile.$id}
         address={address}
         isEdit={isEdit}
         onClose={handleCloseDialog}

@@ -6,6 +6,7 @@ import img1 from "../assets/cart24.png";
 import { useNavigate } from "react-router-dom";
 import { AddressList } from "../components";
 import SelectAddress from "./SelectAddress";
+import appwriteService from "../appwrite/config";
 
 const Checkout = () => {
   const [loading, setLoading] = useState(false);
@@ -107,11 +108,14 @@ const Checkout = () => {
       try {
         setLoading(true);
         setError(false);
-        const response = await axios.delete("/api/v1/ecommerce/cart/clear");
-        if (response.data.statusCode === 200) {
+        for (const document of cart) {
+          await appwriteService.deleteAll(document.$id);
+          // if (response.message == "") {
+          // setCart([]);
           localStorage.setItem("tq", 0);
-          navigate(`/order-status`);
+          setTotalQuantity(0);
           setLoading(false);
+          // }
         }
       } catch (error) {
         if (axios.isCancel(error)) {

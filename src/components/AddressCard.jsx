@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Alocation from "../assets/locationA.png";
 import axios from "axios";
 import { AddressList } from "../components/index";
+import { appwriteService } from "./index";
 
 const AddressCard = ({ address, handleEdit, setAddrTab }) => {
   const [loading, setLoading] = useState(false);
@@ -12,13 +13,11 @@ const AddressCard = ({ address, handleEdit, setAddrTab }) => {
       try {
         setLoading(true);
         setError(false);
-        const response = await axios.delete(
-          "/api/v1/ecommerce/addresses/" + addressid
-        );
-        if (response.data.success) {
+        const response = await appwriteService.deleteAddress(addressid);
+        if (response) {
           setAddrTab();
+          setLoading(false);
         }
-        setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
           console.log("Request canceled", error.message);
@@ -56,7 +55,7 @@ const AddressCard = ({ address, handleEdit, setAddrTab }) => {
             </svg>
 
             <svg
-              onClick={() => deleteAddress(address._id)}
+              onClick={() => deleteAddress(address?.$id)}
               className="w-6 h-6 text-slate-500 hover:text-slate-700 cursor-pointer ms-5"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

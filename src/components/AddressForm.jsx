@@ -1,10 +1,17 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Button, Input, Select } from "./index";
+import { Button, Input, Select, authService } from "./index";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { appwriteService } from "./index";
 
-const AddressForm = ({ addrDialogOpen, onClose, isEdit, address }) => {
+const AddressForm = ({
+  profileID,
+  addrDialogOpen,
+  onClose,
+  isEdit,
+  address,
+}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [loginError, setLoginError] = useState("");
@@ -54,23 +61,24 @@ const AddressForm = ({ addrDialogOpen, onClose, isEdit, address }) => {
 
   const { register, handleSubmit, watch, setValue, reset } = useForm({
     defaultValues: {
-      addressLine1: address?.addressLine1,
-      addressLine2: address?.addressLine2,
+      houseFloor: address?.houseFloor,
+      building: address?.building,
+      landmark: address?.landmark,
       city: address?.city,
       pincode: address?.pincode,
       state: address?.state,
-      country: address?.country,
+      // label: address?.label,
     },
   });
 
   useEffect(() => {
     reset({
-      addressLine1: address?.addressLine1 || "",
-      addressLine2: address?.addressLine2 || "",
+      houseFloor: address?.houseFloor || "",
+      building: address?.building || "",
+      landmark: address?.landmark || "",
       city: address?.city || "",
-      pincode: address?.pincode || "",
-      state: address?.state || "",
-      country: address?.country || "India",
+      pincode: address?.pincode || null,
+      state: address?.state || "Maharashtra",
     });
     // setLocalAddress(address || "");
   }, [address, reset]);
@@ -78,17 +86,16 @@ const AddressForm = ({ addrDialogOpen, onClose, isEdit, address }) => {
   const submit = async (data) => {
     if (isEdit) {
       (async () => {
-        console.log("data address", data);
         try {
           setLoading(true);
           setError(false);
-          const response = await axios.patch(
-            "/api/v1/ecommerce/addresses/" + address._id,
-            { ...data }
-          );
+          const response = await appwriteService.updateAddress(address?.$id, {
+            ...data,
+            userId: profileID,
+          });
           onClose();
           onClose2();
-          console.log("response", response.data);
+          console.log("updateAddress response", response.data);
           console.log("response", response.data.message);
           setLoading(false);
         } catch (error) {
@@ -104,12 +111,12 @@ const AddressForm = ({ addrDialogOpen, onClose, isEdit, address }) => {
     } else {
       //TODO: 27:00 min video 25
       (async () => {
-        console.log("data 2 address", data);
         try {
           setLoading(true);
           setError(false);
-          const response = await axios.post("/api/v1/ecommerce/addresses", {
+          const response = await appwriteService.addAddress({
             ...data,
+            userId: profileID,
           });
           onClose();
           onClose2();
@@ -142,8 +149,8 @@ const AddressForm = ({ addrDialogOpen, onClose, isEdit, address }) => {
 
   // React.useEffect(() => {
   //   const subscription = watch((value, { name }) => {
-  //     //   if (name === "addressLine1") {
-  //     //     setValue("slug", slugTransform(value.addressLine1), {
+  //     //   if (name === "houseFloor") {
+  //     //     setValue("slug", slugTransform(value.houseFloor), {
   //     //       shouldValidate: true,
   //     //     });
   //     //   }
@@ -212,23 +219,36 @@ const AddressForm = ({ addrDialogOpen, onClose, isEdit, address }) => {
                       <div className="grid grid-cols-4 gap-6">
                         <div className="col-span-4">
                           <Input
-                            label="Address Line 1"
+                            label="House No. & Floor*"
                             className=""
-                            {...register("addressLine1", { required: true })}
+                            {...register("houseFloor", { required: true })}
                           ></Input>
                         </div>
                         <div className="col-span-4">
                           <Input
-                            label="Address Line 2"
+                            label="Building & Block No.*"
                             className=""
-                            {...register("addressLine2", { required: true })}
+                            {...register("building", { required: true })}
+                          ></Input>{" "}
+                        </div>{" "}
+                        <div className="col-span-4">
+                          <Input
+                            label="Landmark"
+                            className=""
+                            {...register("landmark", { required: true })}
                           ></Input>{" "}
                         </div>
                         <div className="col-span-2">
                           <Input
+                            type="number"
                             label="Pincode"
                             className=""
-                            {...register("pincode", { required: true })}
+                            {...register("pincode", {
+                              minLength: 6,
+                              maxLength: 6,
+                              valueAsNumber: true,
+                              required: true,
+                            })}
                           ></Input>
                         </div>{" "}
                         <div className="col-span-2">
@@ -246,15 +266,6 @@ const AddressForm = ({ addrDialogOpen, onClose, isEdit, address }) => {
                             className=" "
                             {...register("state", { required: true })}
                           />{" "}
-                        </div>
-                        <div className="col-span-1">
-                          <Select
-                            options={["India"]}
-                            label="country"
-                            className=""
-                            disabled
-                            {...register("country", { required: true })}
-                          />
                         </div>
                         <div className="col-span-4">
                           <Button

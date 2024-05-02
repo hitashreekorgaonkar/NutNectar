@@ -10,11 +10,10 @@ const AddressList = ({ address }) => {
       </div>
       <div className="px-3 col-span-9">
         <p className="text-sm text-slate-500 hover:text-slate-600">
-          {address?.addressLine1}
+          {address?.houseFloor} {address?.building} {address?.landmark}
         </p>
         <p className="text-sm text-slate-500 hover:text-slate-600">
-          {address?.addressLine2} {address?.city} {address?.pincode}{" "}
-          {address?.state}
+          {address?.city} {address?.pincode} {address?.state}
         </p>
       </div>
       {/* </div> */}

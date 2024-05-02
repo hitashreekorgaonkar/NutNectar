@@ -41,7 +41,7 @@ export class Service {
   }
 
   async findMany(userId, productid) {
-    console.log("userId, productid", userId, productid);
+    // console.log("userId, productid", userId, productid);
     try {
       return await this.databases.listDocuments(
         conf.appwriteDatabaseId,
@@ -67,6 +67,19 @@ export class Service {
     }
   }
 
+  async getAddresses(userId) {
+    try {
+      return await this.databases.listDocuments(
+        conf.appwriteDatabaseId,
+        conf.appwriteAddressesCollectionId,
+        [Query.equal("userId", userId)]
+      );
+    } catch (error) {
+      console.log("Appwrite service :: getAddresses :: error", error);
+      return false;
+    }
+  }
+
   async addToCart({ productid, userId, quantity }) {
     try {
       return await this.databases.createDocument(
@@ -85,6 +98,35 @@ export class Service {
     }
   }
 
+  async addAddress({
+    houseFloor,
+    building,
+    landmark,
+    city,
+    pincode,
+    state,
+    userId,
+  }) {
+    try {
+      return await this.databases.createDocument(
+        conf.appwriteDatabaseId,
+        conf.appwriteAddressesCollectionId,
+        ID.unique(),
+        {
+          houseFloor,
+          building,
+          landmark,
+          city,
+          pincode,
+          state,
+          userId,
+        }
+      );
+    } catch (error) {
+      console.log("Appwrite sevice :: addAddress :: error", error);
+    }
+  }
+
   async updateToCart(documentId, { quantity }) {
     try {
       return await this.databases.updateDocument(
@@ -97,6 +139,42 @@ export class Service {
       );
     } catch (error) {
       console.log("Appwrite sevice :: updateToCart :: error", error);
+    }
+  }
+
+  async updateAddress(
+    documentId,
+    { houseFloor, building, landmark, city, pincode, state, userId }
+  ) {
+    try {
+      return await this.databases.updateDocument(
+        conf.appwriteDatabaseId,
+        conf.appwriteAddressesCollectionId,
+        documentId,
+        {
+          houseFloor,
+          building,
+          landmark,
+          city,
+          pincode,
+          state,
+          userId,
+        }
+      );
+    } catch (error) {
+      console.log("Appwrite sevice :: updateAddress :: error", error);
+    }
+  }
+
+  async deleteAddress(documentId) {
+    try {
+      return await this.databases.deleteDocument(
+        conf.appwriteDatabaseId,
+        conf.appwriteAddressesCollectionId,
+        documentId
+      );
+    } catch (error) {
+      console.log("Appwrite sevice :: appwrite Address :: error", error);
     }
   }
 
