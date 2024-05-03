@@ -77,13 +77,13 @@ const Product = () => {
       setError(false);
       appwriteService.getCart(userId).then((items) => {
         // console.log("items", items.documents);
-        let tq = 0;
+        let totqnty = 0;
         items.documents.filter((x) => {
-          tq += x.quantity;
-          // console.log("documents x", tq);
+          totqnty += x.quantity;
+          // console.log("documents x", totqnty);
         });
-        localStorage.setItem("tq", tq);
-        var totqnty = localStorage.getItem("tq");
+        // localStorage.setItem("totqnty", totqnty);
+        // var totqnty = localStorage.getItem("totqnty");
         setTotalQuantity(totqnty);
         setLoading(false);
       });
@@ -106,8 +106,8 @@ const Product = () => {
           userId,
           productid
         );
-        // console.log("checkDocumentId", checkDocumentId);
-        // console.log(".total == 0", checkDocumentId.total == 0);
+        console.log("checkDocumentId", checkDocumentId);
+        console.log(".total == 0", checkDocumentId.total == 0);
 
         if (checkDocumentId.total == 0) {
           const response = await appwriteService.addToCart({
@@ -115,9 +115,10 @@ const Product = () => {
             productid,
             quantity: productQuantity,
           });
-          // console.log("addToCart response", response);
+          console.log("addToCart response", response);
           if (response) getProdQty(userId);
         } else {
+          console.log("updateToCart productQuantity", productQuantity);
           const response = await appwriteService.updateToCart(
             checkDocumentId.documents[0].$id,
             {
@@ -125,7 +126,7 @@ const Product = () => {
             }
           );
           if (response) getProdQty(userId);
-          // console.log("updateToCart response", response);
+          console.log("updateToCart response", response);
         }
 
         // getProdQty();

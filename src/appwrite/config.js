@@ -22,7 +22,7 @@ export class Service {
         id
       );
     } catch (error) {
-      console.log("Appwrite service :: getPost :: error", error);
+      console.log("Appwrite service :: getProduct :: error", error);
       return false;
     }
   }
@@ -59,7 +59,7 @@ export class Service {
       return await this.databases.listDocuments(
         conf.appwriteDatabaseId,
         conf.appwriteCartCollectionId,
-        [Query.equal("userId", userId)]
+        [Query.equal("userId", userId), Query.equal("ordered", false)]
       );
     } catch (error) {
       console.log("Appwrite service :: getPost :: error", error);
@@ -80,6 +80,18 @@ export class Service {
     }
   }
 
+  async getAddress(id) {
+    try {
+      return await this.databases.getDocument(
+        conf.appwriteDatabaseId,
+        conf.appwriteAddressesCollectionId,
+        id
+      );
+    } catch (error) {
+      console.log("Appwrite service :: getAddress :: error", error);
+      return false;
+    }
+  }
   async addToCart({ productid, userId, quantity }) {
     try {
       return await this.databases.createDocument(
@@ -91,6 +103,24 @@ export class Service {
           productid: productid,
           product: productid,
           quantity: quantity,
+        }
+      );
+    } catch (error) {
+      console.log("Appwrite sevice :: addToCart :: error", error);
+    }
+  }
+
+  async addOrder({ userId, cartTotal, addressId, cartsId }) {
+    try {
+      return await this.databases.createDocument(
+        conf.appwriteDatabaseId,
+        conf.appwriteOrdersCollectionId,
+        ID.unique(),
+        {
+          userId: userId,
+          cartTotal: cartTotal,
+          addressId: addressId,
+          cartsId: cartsId,
         }
       );
     } catch (error) {
@@ -139,6 +169,21 @@ export class Service {
       );
     } catch (error) {
       console.log("Appwrite sevice :: updateToCart :: error", error);
+    }
+  }
+
+  async updateCartOrderStatus(documentId) {
+    try {
+      return await this.databases.updateDocument(
+        conf.appwriteDatabaseId,
+        conf.appwriteCartCollectionId,
+        documentId,
+        {
+          ordered: true,
+        }
+      );
+    } catch (error) {
+      console.log("Appwrite sevice :: updateCart Order Status :: error", error);
     }
   }
 

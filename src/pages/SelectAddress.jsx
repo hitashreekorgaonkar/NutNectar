@@ -1,8 +1,8 @@
 import React, { useState, useContext, useEffect } from "react";
-import { AddressList } from "../components/index";
+import { AddressList, appwriteService } from "../components/index";
 import axios from "axios";
 
-const SelectAddress = ({ addressId, changeAddrDialog, onClose }) => {
+const SelectAddress = ({ userId, addressId, changeAddrDialog, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedAddress, setSelectedAddress] = useState("");
@@ -18,12 +18,12 @@ const SelectAddress = ({ addressId, changeAddrDialog, onClose }) => {
       try {
         setLoading(true);
         setError(false);
-        const response = await axios.get(
-          "/api/v1/ecommerce/addresses?page=1&limit=10"
-        );
-        setAddressList(response.data.data.addresses);
-        // console.log("addressList", addressList);
-        setLoading(false);
+        const response = await appwriteService.getAddresses(userId);
+        if (response) {
+          setAddressList(response?.documents);
+          // console.log("addressList", addressList);
+          setLoading(false);
+        }
       } catch (error) {
         if (axios.isCancel(error)) {
           console.log("Request canceled", error.message);
@@ -98,16 +98,16 @@ const SelectAddress = ({ addressId, changeAddrDialog, onClose }) => {
                     {addressList.map((address) => (
                       <div
                         className="grid grid-cols-12 justify-between px-9 py-4"
-                        key={address?._id}
+                        key={address?.$id}
                       >
                         <div className="col-2">
                           {" "}
                           <input
                             type="radio"
-                            id={address._id}
-                            value={address._id}
-                            checked={selectedAddress === address._id}
-                            onChange={() => handleRadioChange(address._id)}
+                            id={address.$id}
+                            value={address.$id}
+                            checked={selectedAddress === address.$id}
+                            onChange={() => handleRadioChange(address.$id)}
                           />
                         </div>
                         <AddressList address={address} />
@@ -115,7 +115,7 @@ const SelectAddress = ({ addressId, changeAddrDialog, onClose }) => {
                     ))}
                     {/* <div
                       className="grid grid-cols-12 justify-between px-9 py-4"
-                      key={address?._id}
+                      key={address?.$id}
                     >
                       <AddressList address={address} />
                     </div>{" "} */}

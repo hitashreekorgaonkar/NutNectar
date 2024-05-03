@@ -14,7 +14,6 @@ export default function Home() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSignUpDialogOpen, setIsSignUpDialogOpen] = useState(false);
   const userId = useSelector((state) => state.auth.userData);
-  console.log("userId cart", userId);
   useEffect(() => {
     var authValue = localStorage.getItem("authToken");
     if (!authValue) {

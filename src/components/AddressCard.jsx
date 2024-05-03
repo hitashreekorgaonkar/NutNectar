@@ -33,7 +33,7 @@ const AddressCard = ({ address, handleEdit, setAddrTab }) => {
     <>
       <div
         className="grid grid-cols-12 justify-between px-9 py-4"
-        key={address?._id}
+        key={address?.$id}
       >
         <AddressList address={address} />
         <div className="col-1">

@@ -44,8 +44,8 @@ const Login = ({ isDialogOpen, onClose }) => {
         if (userData) {
           dispatch(authLogin(userData));
           localStorage.setItem("userID", JSON.stringify(userData.$id));
-          console.log("log userData", userData);
-          console.log("log userData $id", userData.$id);
+          // console.log("log userData", userData);
+          // console.log("log userData $id", userData.$id);
         }
         navigate("/");
         onSignUpCreate();

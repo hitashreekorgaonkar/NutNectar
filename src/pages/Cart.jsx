@@ -102,7 +102,7 @@ const Cart = () => {
           await appwriteService.deleteAll(document.$id);
           // if (response.message == "") {
           setCart([]);
-          localStorage.setItem("tq", 0);
+          // localStorage.setItem("totqnty", 0);
           setTotalQuantity(0);
           setLoading(false);
           // }
@@ -119,10 +119,10 @@ const Cart = () => {
   };
 
   if (cart?.length) {
-    let tq = 0;
-    cart?.filter((x) => (tq += x.quantity));
-    localStorage.setItem("tq", tq);
-    var totqnty = localStorage.getItem("tq");
+    let totqnty = 0;
+    cart?.filter((x) => (totqnty += x.quantity));
+    // localStorage.setItem("totqnty", totqnty);
+    // var totqnty = localStorage.getItem("totqnty");
     setTotalQuantity(totqnty);
   }
 

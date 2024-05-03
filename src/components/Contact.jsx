@@ -15,8 +15,6 @@ function Contact() {
   const { addContact } = useTodo();
 
   const add = (e) => {
-    console.log("add", userName, email, message);
-
     e.preventDefault();
 
     if (!userName) return;

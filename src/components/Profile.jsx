@@ -11,12 +11,12 @@ const Profile = ({ profile }) => {
       const response = await authService.updateName({
         name,
       });
-      console.log("response", response);
+      // console.log("response", response);
       // if (response.data.statusCode === 200) {
       // setName(response.data.data.name);
       // }
     } catch (error) {
-      console.log("error", error);
+      // console.log("error", error);
       setError(error.message);
     }
   };

@@ -8,7 +8,7 @@ export const setPrice = async () => {
     input.addEventListener("input", (e) => {
       let minPrice = parseInt(priceInput[0].value);
       let maxPrice = parseInt(priceInput[1].value);
-      console.log("rangeInput[1].max", rangeInput[1].max);
+      // console.log("rangeInput[1].max", rangeInput[1].max);
       if (maxPrice - minPrice >= priceGap && maxPrice <= rangeInput[1].max) {
         if (
           e.target.className ===

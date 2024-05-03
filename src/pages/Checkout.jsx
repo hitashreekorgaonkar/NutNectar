@@ -13,12 +13,20 @@ const Checkout = () => {
   const [error, setError] = useState(false);
   const [address, setAddress] = useState(null);
   const [addressid, setAddressID] = useState(null);
+  const [cartID, setCartID] = useState([]);
   const [changeAddrDialog, setChangeAddrDialog] = useState(false);
   const navigate = useNavigate();
   const { state } = useLocation();
+  const [cart, cartList] = useState(state.cart);
+  const [userId, setUserID] = useState(
+    JSON.parse(localStorage.getItem("userID"))
+  );
 
   useEffect(() => {
+    // console.log("cart", cart);
     setAddressMenu();
+    // const ids = cart.map((item) => item.$id);
+    // console.log("ids", ids);
   }, []);
 
   const getAddress = (selAddr) => {
@@ -26,15 +34,12 @@ const Checkout = () => {
       try {
         setLoading(true);
         setError(false);
-        const response = await axios.get(
-          "/api/v1/ecommerce/addresses/" + selAddr
-        );
-        if (response.data.statusCode == 200) {
-          setAddress(response.data.data);
-          setAddressID(response.data.data._id);
+        const response = await appwriteService.getAddress(selAddr);
+        if (response) {
+          setAddress(response);
+          setAddressID(response.$id);
+          setLoading(false);
         }
-
-        setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
           console.log("Request canceled", error.message);
@@ -51,14 +56,12 @@ const Checkout = () => {
       try {
         setLoading(true);
         setError(false);
-        const response = await axios.get(
-          "/api/v1/ecommerce/addresses?page=1&limit=1"
-        );
-        if (response.data.statusCode == 200) {
-          setAddress(response.data.data.addresses[0]);
-          setAddressID(response.data.data.addresses[0]._id);
+        const response = await appwriteService.getAddresses(userId);
+        if (response) {
+          setAddress(response.documents[0]);
+          setAddressID(response.documents[0].$id);
+          setLoading(false);
         }
-        setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
           console.log("Request canceled", error.message);
@@ -84,13 +87,27 @@ const Checkout = () => {
       try {
         setLoading(true);
         setError(false);
-        const response = await axios.post(
-          "/api/v1/ecommerce/orders/provider/razorpal",
-          {
-            addressId: addressid,
-          }
-        );
-        clearCart();
+        const productInfo = cart.map((order) => {
+          return {
+            productId: order.productid,
+            quantity: String(order.quantity),
+          };
+        });
+
+        const cartsID = cart.map((item) => item?.$id);
+
+        const response = await appwriteService.addOrder({
+          userId: userId,
+          cartTotal: state.cartTotal,
+          addressId: addressid,
+          cartsId: cartsID,
+        });
+        // console.log("response orders", response);
+        updateCartStatus(cartsID);
+        navigate("/order-status");
+        // localStorage.setItem("tq", 0);
+        setTotalQuantity(0);
+
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -103,16 +120,16 @@ const Checkout = () => {
     })();
   };
 
-  const clearCart = () => {
+  const updateCartStatus = (cartsID) => {
     (async () => {
       try {
         setLoading(true);
         setError(false);
-        for (const document of cart) {
-          await appwriteService.deleteAll(document.$id);
+        for (const id of cartsID) {
+          const res = await appwriteService.updateCartOrderStatus(id);
           // if (response.message == "") {
           // setCart([]);
-          localStorage.setItem("tq", 0);
+          // localStorage.setItem("tq", 0);
           setTotalQuantity(0);
           setLoading(false);
           // }
@@ -150,7 +167,7 @@ const Checkout = () => {
             {address ? (
               <div
                 className="grid grid-cols-12 justify-between px-9 py-4"
-                key={address?._id}
+                key={address?.$id}
               >
                 <AddressList address={address} />
                 <div className="col-1">
@@ -175,26 +192,29 @@ const Checkout = () => {
           </div>
           <div className="col-span-11 lg:col-span-4 xl:col-span-5 md:px-40 lg:px-8 md:mt-8">
             {state.cart.map((item) => (
-              <div className="grid grid-cols-12" key={item.product._id}>
+              <div className="grid grid-cols-12" key={item?.product.$id}>
                 <div className="col-span-2 relative ">
                   <img
                     className="my-2 border rounded-lg px-1.5"
-                    src={item.product.mainImage.url}
-                    alt=""
+                    // src={item.product.mainImage.url}
+                    src={appwriteService.getFilePreview(
+                      item?.product?.mainImage
+                    )}
+                    alt={item?.product?.name}
                     srcSet=""
                   />
                   <div className="absolute h-5 w-5 -right-2 -top-1 bg-gray-500 rounded-full text-center text-white text-sm">
-                    {item.quantity}
+                    {item?.quantity}
                   </div>
                 </div>
                 <div className="col-span-8 content-center ps-4">
                   {" "}
-                  {item.product.name}
+                  {item?.product.name}
                 </div>
                 <div className="col-span-2 content-center">
                   <p className="text-right">
                     {" "}
-                    ₹{item.quantity * item.product.price}
+                    ₹{item?.quantity * item?.product?.price}
                   </p>
                 </div>{" "}
               </div>
@@ -206,7 +226,7 @@ const Checkout = () => {
               </div>
               <div>
                 {" "}
-                <p className="font-semibold text-right">₹{state.cartTotal}</p>
+                <p className="font-semibold text-right">₹{state?.cartTotal}</p>
               </div>
             </div>
             <div className="flex justify-between my-3">
@@ -230,7 +250,7 @@ const Checkout = () => {
               <div>
                 {" "}
                 <p className="text-2xl font-semibold text-right">
-                  ₹{state.cartTotal + 200}
+                  ₹{state?.cartTotal + 200}
                 </p>
               </div>
             </div>
@@ -246,6 +266,7 @@ const Checkout = () => {
       </div>
       {addressid ? (
         <SelectAddress
+          userId={userId}
           addressId={addressid}
           onClose={handleCloseDialog}
           changeAddrDialog={changeAddrDialog}

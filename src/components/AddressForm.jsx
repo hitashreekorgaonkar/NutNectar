@@ -95,8 +95,7 @@ const AddressForm = ({
           });
           onClose();
           onClose2();
-          console.log("updateAddress response", response.data);
-          console.log("response", response.data.message);
+          // console.log("updateAddress response", response.data);
           setLoading(false);
         } catch (error) {
           if (axios.isCancel(error)) {
@@ -120,11 +119,9 @@ const AddressForm = ({
           });
           onClose();
           onClose2();
-          console.log("response", response);
-          console.log("response", response.data.message);
+          // console.log("response", response);
           setLoading(false);
         } catch (error) {
-          console.log("Request canceled", error);
           if (axios.isCancel(error)) {
             setLoginError(error?.response.data?.message);
             console.log("Request canceled", error.message);
@@ -226,14 +223,14 @@ const AddressForm = ({
                         </div>
                         <div className="col-span-4">
                           <Input
-                            label="Building & Block No.*"
+                            label="Building*"
                             className=""
                             {...register("building", { required: true })}
                           ></Input>{" "}
                         </div>{" "}
                         <div className="col-span-4">
                           <Input
-                            label="Landmark"
+                            label="Landmark and Area Name"
                             className=""
                             {...register("landmark", { required: true })}
                           ></Input>{" "}
