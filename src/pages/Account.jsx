@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import LoggedInUserContext from "../context/loggedInUser/LoggedInUserContext";
 import axios from "axios";
 import user from "../assets/user.png";
+import shoppingbag from "../assets/bag.png";
 import location from "../assets/location.png";
 import { useNavigate } from "react-router-dom";
 import {
@@ -238,7 +239,12 @@ const Account = () => {
               } flex p-3 my-2 rounded-lg font-semibold cursor-pointer`}
             >
               {" "}
-              <img className="relative mx-2" width={23} src={user} alt="" />
+              <img
+                className="relative mx-2"
+                width={24}
+                src={shoppingbag}
+                alt=""
+              />
               Orders
             </p>
             <p

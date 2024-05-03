@@ -185,14 +185,25 @@ const Checkout = () => {
                   </div>
                 </div>
               </div>
-            ) : null}
-            <div
-              className="hidden lg:grid px-20 sm:px-48 py-4 shadow bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white
+            ) : (
+              <div>
+                <div
+                  onClick={() => navigate("/account")}
+                  className="px-1 sm:px-2 py-2 text-center bg-indigo-700 text-white rounded font-bold cursor-pointer"
+                >
+                  Add Address
+                </div>
+              </div>
+            )}
+            {address && (
+              <div
+                className="hidden lg:grid px-20 sm:px-48 py-4 shadow bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white
                rounded-full cursor-pointer text-center text-xl lg:px-8 mt-5"
-              onClick={() => addOrder()}
-            >
-              Cash On Delivery
-            </div>
+                onClick={() => addOrder()}
+              >
+                Cash On Delivery
+              </div>
+            )}
           </div>
           <div className="col-span-11 lg:col-span-4 xl:col-span-5 md:px-40 lg:px-8 md:mt-8">
             {state.cart.map((item) => (
