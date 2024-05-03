@@ -12,8 +12,8 @@ const Card = ({ $id, mainImage, name, price }) => {
           alt={name}
           srcSet=""
         />
-        <h3>{name}</h3>
-        <p>{price}</p>
+        <h3 className="font-medium">{name}</h3>
+        <p>₹{price}</p>
       </div>
     </Link>
   );
