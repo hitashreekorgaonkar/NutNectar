@@ -106,8 +106,8 @@ const Product = () => {
           userId,
           productid
         );
-        console.log("checkDocumentId", checkDocumentId);
-        console.log(".total == 0", checkDocumentId.total == 0);
+        // console.log("checkDocumentId", checkDocumentId);
+        // console.log(".total == 0", checkDocumentId.total == 0);
 
         if (checkDocumentId.total == 0) {
           const response = await appwriteService.addToCart({
@@ -115,10 +115,10 @@ const Product = () => {
             productid,
             quantity: productQuantity,
           });
-          console.log("addToCart response", response);
+          // console.log("addToCart response", response);
           if (response) getProdQty(userId);
         } else {
-          console.log("updateToCart productQuantity", productQuantity);
+          // console.log("updateToCart productQuantity", productQuantity);
           const response = await appwriteService.updateToCart(
             checkDocumentId.documents[0].$id,
             {
@@ -126,7 +126,7 @@ const Product = () => {
             }
           );
           if (response) getProdQty(userId);
-          console.log("updateToCart response", response);
+          // console.log("updateToCart response", response);
         }
 
         // getProdQty();

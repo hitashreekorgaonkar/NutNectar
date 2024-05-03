@@ -12,6 +12,7 @@ import {
   logout as authLogout,
   QuantityContext,
   appwriteService,
+  OrdersList,
 } from "../components/index";
 import { useDispatch } from "react-redux";
 
@@ -21,8 +22,10 @@ const Account = () => {
   const [addrDialogOpen, setAddrDialogOpen] = useState(false);
   const [addrActive, setAddrActive] = useState(true);
   const [profileActive, setProfileActive] = useState(false);
+  const [ordersActive, setOrdersActive] = useState(false);
   const [addressList, setAddressList] = useState([]);
   const [profile, setProfile] = useState({});
+  const [orderList, setOrderList] = useState([]);
   const [address, setAddress] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
   const { setTotalQuantity } = useContext(QuantityContext);
@@ -35,6 +38,7 @@ const Account = () => {
   const setAddrTab = () => {
     setAddrActive(true);
     setProfileActive(false);
+    setOrdersActive(false);
     setProfileUser();
     setAddressMenu();
   };
@@ -42,6 +46,7 @@ const Account = () => {
   useEffect(() => {
     setProfileUser();
     setAddressMenu();
+    setUserOrders();
   }, []);
 
   const setAddressMenu = () => {
@@ -51,6 +56,7 @@ const Account = () => {
         setError(false);
         const response = await appwriteService.getAddresses(userId);
         setAddressList(response.documents);
+        // console.log("address list", addressList);
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -68,7 +74,6 @@ const Account = () => {
       try {
         setLoading(true);
         setError(false);
-        // const response = await axios.get("/api/v1/ecommerce/profile");
         const userData = await authService.getCurrentUser();
         // console.log("1 userData", userData);
         setProfile(userData);
@@ -84,8 +89,37 @@ const Account = () => {
     })();
   };
 
+  const setUserOrders = () => {
+    (async () => {
+      try {
+        setLoading(true);
+        setError(false);
+        // console.log("1 userId", userId);
+        const response = await appwriteService.getOrders(userId);
+        setOrderList(response.documents.reverse());
+        // console.log("Orders loaded", response.documents);
+        setLoading(false);
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log("Request canceled", error.message);
+          return;
+        }
+        setError(true);
+        setLoading(false);
+      }
+    })();
+  };
+
+  const setOrdersTab = () => {
+    setAddrActive(false);
+    setProfileActive(false);
+    setOrdersActive(true);
+    setUserOrders();
+  };
+
   const setProfileTab = () => {
     setAddrActive(false);
+    setOrdersActive(false);
     setProfileActive(true);
 
     (async () => {
@@ -198,6 +232,16 @@ const Account = () => {
               Profile
             </p>
             <p
+              onClick={() => setOrdersTab()}
+              className={`${
+                ordersActive ? "bg-white text-blue-800" : ""
+              } flex p-3 my-2 rounded-lg font-semibold cursor-pointer`}
+            >
+              {" "}
+              <img className="relative mx-2" width={23} src={user} alt="" />
+              Orders
+            </p>
+            <p
               onClick={logout}
               className="text-lg text-center font-semibold border-t py-2 border-gray-500 cursor-pointer"
             >
@@ -231,6 +275,11 @@ const Account = () => {
             )}
 
             {profileActive && <Profile loading={loading} profile={profile} />}
+            {orderList?.map((order) => (
+              <div key={order?.$id}>
+                {ordersActive && <OrdersList order={order} />}
+              </div>
+            ))}
           </div>
           {/* <div className="row-span-2 col-span-2">03</div> */}
         </div>

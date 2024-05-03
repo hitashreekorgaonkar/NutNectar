@@ -62,7 +62,7 @@ export class Service {
         [Query.equal("userId", userId), Query.equal("ordered", false)]
       );
     } catch (error) {
-      console.log("Appwrite service :: getPost :: error", error);
+      console.log("Appwrite service :: getCart :: error", error);
       return false;
     }
   }
@@ -92,6 +92,7 @@ export class Service {
       return false;
     }
   }
+
   async addToCart({ productid, userId, quantity }) {
     try {
       return await this.databases.createDocument(
@@ -110,7 +111,7 @@ export class Service {
     }
   }
 
-  async addOrder({ userId, cartTotal, addressId, cartsId }) {
+  async addOrder({ userId, cartTotal, addressId, cartsId, productsName }) {
     try {
       return await this.databases.createDocument(
         conf.appwriteDatabaseId,
@@ -121,6 +122,7 @@ export class Service {
           cartTotal: cartTotal,
           addressId: addressId,
           cartsId: cartsId,
+          productsName: productsName,
         }
       );
     } catch (error) {
@@ -250,6 +252,19 @@ export class Service {
 
   getFilePreview(fileId) {
     return this.bucket.getFilePreview(conf.appwriteBucketId, fileId);
+  }
+
+  async getOrders(userId) {
+    try {
+      return await this.databases.listDocuments(
+        conf.appwriteDatabaseId,
+        conf.appwriteOrdersCollectionId,
+        [Query.equal("userId", userId)]
+      );
+    } catch (error) {
+      console.log("Appwrite service :: getOrders :: error", error);
+      return false;
+    }
   }
 }
 

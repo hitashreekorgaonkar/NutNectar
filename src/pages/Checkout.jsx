@@ -93,14 +93,17 @@ const Checkout = () => {
             quantity: String(order.quantity),
           };
         });
-
+        // console.log("cart", cart);
         const cartsID = cart.map((item) => item?.$id);
+        const orderProd = cart.map((item) => item?.product.name);
+        // console.log("orderProd", orderProd);
 
         const response = await appwriteService.addOrder({
           userId: userId,
           cartTotal: state.cartTotal,
           addressId: addressid,
           cartsId: cartsID,
+          productsName: orderProd,
         });
         // console.log("response orders", response);
         updateCartStatus(cartsID);
@@ -130,10 +133,11 @@ const Checkout = () => {
           // if (response.message == "") {
           // setCart([]);
           // localStorage.setItem("tq", 0);
-          setTotalQuantity(0);
-          setLoading(false);
           // }
         }
+        setTotalQuantity(0);
+        setLoading(false);
+        // console.log("res", res);
       } catch (error) {
         if (axios.isCancel(error)) {
           console.log("Request canceled", error.message);

@@ -128,9 +128,9 @@ const Cart = () => {
 
   return (
     <>
-      {error && <h1 className="text-center mt-5">1Something went wrong</h1>}
+      {error && <h1 className="text-center mt-5">Something went wrong</h1>}
 
-      <div className="md:container md:mx-auto md:px-16 lg:px-36">
+      <div className="md:container md:mx-auto md:px-16 lg:px-36 h-screen">
         <p className="text-center text-4xl text-red-500 py-2">Your Cart</p>
         <div className="grid grid-cols-9 border-t-2 py-2 px-5">
           <div className="col-span-6 text-center">Product</div>
