@@ -143,11 +143,18 @@ const Cart = () => {
             <div className="col-span-1">
               <img
                 className=" my-2 border"
+                src={item.product.mainImage}
+                alt={item.product?.name}
+                srcSet=""
+              />
+              {/* commenting below code as appwrite has asked to upgrade for image storage */}
+              {/* <img
+                className=" my-2 border"
                 // src={item.product.mainImage}
                 src={appwriteService.getFilePreview(item.product?.mainImage)}
                 alt={item.product?.name}
                 srcSet=""
-              />
+              /> */}
             </div>
             <div className="col-span-5 content-center ps-4">
               {" "}

@@ -195,10 +195,17 @@ const Product = () => {
           <div className="col-span-6 md:col-span-3 flex justify-center">
             <img
               className="w-9/12 h-min"
-              src={appwriteService.getFilePreview(product?.mainImage)}
+              src={product?.mainImage}
               alt={product?.name}
               srcSet=""
             />
+            {/* commenting below code as appwrite has asked to upgrade for image storage */}
+            {/* <img
+              className="w-9/12 h-min"
+              src={appwriteService.getFilePreview(product?.mainImage)}
+              alt={product?.name}
+              srcSet=""
+            /> */}
           </div>
           <div className="col-span-6 md:col-span-3">
             <div className="">

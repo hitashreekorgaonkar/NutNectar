@@ -280,9 +280,9 @@ const Store = () => {
             )}
             {/* {JSON.stringify(products)} */}
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 px-5">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 px-5 pb-5">
             {sortedProducts.map((product) => (
-              <div className="" key={product.$id}>
+              <div className="border rounded-md shadow-sm" key={product.$id}>
                 <Card {...product} />
               </div>
             ))}

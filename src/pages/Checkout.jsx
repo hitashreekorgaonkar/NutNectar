@@ -211,10 +211,10 @@ const Checkout = () => {
                 <div className="col-span-2 relative ">
                   <img
                     className="my-2 border rounded-lg px-1.5"
-                    // src={item.product.mainImage.url}
-                    src={appwriteService.getFilePreview(
-                      item?.product?.mainImage
-                    )}
+                    src={item.product.mainImage}
+                    // src={appwriteService.getFilePreview(
+                    //   item?.product?.mainImage
+                    // )}
                     alt={item?.product?.name}
                     srcSet=""
                   />
